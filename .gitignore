@@ -45,3 +45,12 @@ tmp/
 
 # Private course material (kept local, never published)
 .course/
+
+# Research safety net: identifying material must never be committed
+docs/research/**/private/
+*.m4a
+*.mp3
+*.wav
+*.aac
+*.ogg
+*.opus

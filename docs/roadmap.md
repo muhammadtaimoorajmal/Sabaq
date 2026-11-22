@@ -33,7 +33,7 @@ For the product itself, see the [vision](vision.md).
 - **Goal:** A clean, welcoming repository that explains the product truthfully from the first commit.
 - **Deliverables:** README, license, contribution guide, code of conduct, security policy, changelog; issue forms (bug, feature, usability finding) and pull-request template; editor and line-ending configuration; monorepo skeleton; vision and roadmap.
 
-### M02 · User research kit
+### M02 · User research kit ✅
 
 - **Goal:** Everything needed to run rigorous user research with real students, class representatives and instructors.
 - **Depends on:** M01.
