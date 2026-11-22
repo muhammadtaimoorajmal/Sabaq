@@ -4,48 +4,45 @@
 
 **Your semester, in one calm place.**
 
-One structured place for every deadline, announcement and submission rule, so students stop missing deadlines and stop losing marks to avoidable mistakes.
+An open-source academic companion that brings every deadline, announcement and submission rule into one structured place, so students stop missing deadlines and stop losing marks to avoidable mistakes.
 
-[![Status](https://img.shields.io/badge/status-in%20development-orange)](docs/01-module-plans.md)
-[![Progress](https://img.shields.io/badge/progress-module%201%20of%2030-blue)](#roadmap)
+[![Status](https://img.shields.io/badge/status-in%20development-orange)](docs/roadmap.md)
+[![Roadmap](https://img.shields.io/badge/roadmap-1%20of%2030%20milestones-blue)](#roadmap)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-[Vision](docs/00-vision-and-plan.md) · [Build plan](docs/01-module-plans.md) · [Roadmap](#roadmap) · [Contributing](CONTRIBUTING.md)
+[Vision](docs/vision.md) · [Roadmap](docs/roadmap.md) · [Documentation](docs/README.md) · [Contributing](CONTRIBUTING.md)
 
 </div>
 
 ---
 
 > [!NOTE]
-> Sabaq is being built in public, one module at a time, as the semester project for **Human Computer Interaction (SE3223)** at Riphah International University, Fall 2026.
-> This README only describes what exists in the repository. The live app link will appear here once it is deployed (Module 16).
+> Sabaq is under active development and is not usable yet. This README only describes what already exists; the live app will be linked here once it is deployed.
 
-## The problem
+## Why Sabaq
 
-Course information is scattered across WhatsApp class groups, the university LMS (Moellim) and PDF lab manuals. As a result:
+Course information usually arrives through channels that were never designed for it: chat groups, the learning management system (LMS), PDF handouts and verbal reminders. The result:
 
-- announcements get buried in chat, so deadlines are missed or discovered late;
-- submission rules such as `Lab11_SAPID_CS5-1` live on page 2 of a PDF, and a wrong file name can cost 10% of the marks;
-- nobody, student or instructor, can see when several courses' deadlines pile up on the same day;
-- whoever posts an announcement never knows whether the class actually saw it.
+- **Announcements get buried.** A deadline posted in a busy chat group is easy to miss.
+- **Rules hide in documents.** File-naming rules such as `Lab11_<StudentID>_<Section>` sit inside a PDF, and a wrong name can cost marks.
+- **Workload is invisible.** Nobody, student or instructor, can see when several courses pile deadlines onto the same day.
+- **Senders fly blind.** Whoever posts an announcement never knows whether the class actually saw it.
 
-In HCI terms: students face a wide **gulf of evaluation** (they cannot see the state of their semester) and the system offers **no error prevention** (mistakes are found only after marks are lost).
-
-## The solution
+## What Sabaq does
 
 | Feature | What it does |
 | --- | --- |
 | **Today and Timeline** | Every deadline, quiz and class across all courses, ordered by urgency |
-| **Structured Announcements** | One post by a CR or instructor becomes a deadline in every student's timeline |
-| **"Seen by" receipts** | Senders know how many students have seen each announcement |
-| **Paste-to-Structure Assistant** | Paste a WhatsApp-style message; Sabaq drafts a structured announcement to confirm |
-| **Submission Checker** | Checks a file's name, type, size and timing against the assignment's rules *before* upload, right in the browser |
-| **Workload Heatmap and Clash Warning** | Shows crunch days; warns instructors when a new deadline lands on an already busy day |
+| **Structured Announcements** | One post by a class representative or instructor becomes a deadline in every student's timeline |
+| **"Seen by" receipts** | Senders see how many students have seen each announcement |
+| **Paste-to-Structure Assistant** | Paste a chat-style message; Sabaq drafts a structured announcement for you to confirm |
+| **Submission Checker** | Checks a file's name, type, size and timing against the assignment's rules before upload, entirely in the browser |
+| **Workload Heatmap and Clash Warning** | Shows crunch days, and warns instructors when a new deadline lands on an already busy day |
 | **Planner** | Drag tasks into study slots, with a full keyboard alternative |
-| **Study Group Finder** | Find or form study groups per course |
-| **Focus mode and personalization** | Quiet hours, light, dark and high-contrast themes, font size, density, English and Urdu |
+| **Study Group Finder** | Find or form study groups for each course |
+| **Focus and personalization** | Quiet hours; light, dark and high-contrast themes; text size; density; multiple languages including right-to-left |
 
-### What is new
+### What makes it different
 
 Learning management systems, calendars and to-do apps already exist, but none of them:
 
@@ -55,20 +52,22 @@ Learning management systems, calendars and to-do apps already exist, but none of
 4. accept **the way classes already communicate** (pasted chat messages);
 5. tell senders **who has actually seen** an announcement.
 
-Read the full reasoning in the [product vision](docs/00-vision-and-plan.md).
+Read the full reasoning in the [product vision](docs/vision.md).
 
 ## Who it is for
 
 | Role | Uses Sabaq to |
 | --- | --- |
-| **Students** (primary) | See what is due, submit correctly, plan their week, find study partners |
-| **CRs** (secondary) | Post announcements once instead of answering the same questions repeatedly |
-| **Instructors** (secondary) | Set deadlines with clear rules, avoid overloading the class, confirm information arrived |
+| **Students** | See what is due, submit correctly, plan the week, find study partners |
+| **Class representatives** | Post announcements once instead of answering the same questions again and again |
+| **Instructors** | Set deadlines with clear rules, avoid overloading the class, confirm information arrived |
 | **Admins** | Manage programs, classes and users |
 
-## Built on HCI principles
+## Designed with users, not just for them
 
-Sabaq follows a user-centered design process (ISO 9241-210) across six phases: user research → ideation → low-fidelity prototyping → formative testing → high-fidelity iteration → summative evaluation. Every phase is documented in [`docs/`](docs/README.md), and every major design decision is recorded as a QOC (Question–Option–Criteria) design-rationale record.
+Sabaq follows a user-centered design process: field research → personas and task analysis → competing concepts → low-fidelity prototypes → usability testing → iteration → a measured benchmark against today's workflow. Research instruments, findings, design decisions and test results are all published in [`docs/`](docs/README.md).
+
+Accessibility is a requirement, not a feature: every screen is built to work with a keyboard alone, with screen readers, at 200% zoom, in high contrast and in right-to-left languages.
 
 ## Architecture
 
@@ -97,49 +96,49 @@ Sabaq/
 │   └── api/          Express backend
 ├── packages/
 │   └── shared/       Types, validation schemas and domain logic
-├── docs/             Research, design, design rationale, testing, style guide
+├── docs/             Vision, roadmap, research, design, decisions, testing
 └── .github/          Workflows and templates
 ```
 
 ## Getting started
 
-The development toolchain is introduced in Module 03; setup instructions will appear here then.
+Development setup instructions will be added together with the toolchain.
 
 Requirements: **Node.js 22 LTS** or newer (see [`.nvmrc`](.nvmrc)) and Git.
 
 ## Roadmap
 
-Sabaq is built in 30 verified modules. Each module is committed and pushed on its own. Details are in the [build plan](docs/01-module-plans.md).
+Sabaq is built in 30 milestones, each verified before release. Details are in the [roadmap](docs/roadmap.md).
 
-**Phase 0 · Foundation**
+**Foundation**
 
 - [x] M01 · Repository foundation
-- [ ] M02 · Research kit
-- [ ] M03 · Monorepo tooling and CI
+- [ ] M02 · User research kit
+- [ ] M03 · Tooling and continuous integration
 - [ ] M04 · Shared domain package
 
-**Phase A · Backend core**
+**Backend core**
 
 - [ ] M05 · API scaffold
-- [ ] M06 · Database models and seed data
+- [ ] M06 · Database
 - [ ] M07 · Authentication API
 
-**Phases 1–4 · Research and design**
+**Research and design**
 
 - [ ] M08 · Research synthesis
 - [ ] M09 · Personas, goals, task analysis, usability targets
-- [ ] M10 · Ideation, concepts, design rationale
+- [ ] M10 · Ideation and concept selection
 - [ ] M11 · Information architecture and low-fidelity prototype
-- [ ] M12 · Formative usability testing, round 1
+- [ ] M12 · Formative usability testing
 
-**Phase B · Frontend foundation**
+**Frontend foundation**
 
-- [ ] M13 · Design system and style guide
-- [ ] M14 · Web app scaffold and app shell
+- [ ] M13 · Design system
+- [ ] M14 · App shell
 - [ ] M15 · Authentication screens
-- [ ] M16 · Deployment pipeline
+- [ ] M16 · Deployment
 
-**Phase C · Features**
+**Features**
 
 - [ ] M17 · Classes and membership
 - [ ] M18 · Onboarding, profile and personalization
@@ -153,24 +152,15 @@ Sabaq is built in 30 verified modules. Each module is committed and pushed on it
 - [ ] M26 · Notifications and focus mode
 - [ ] M27 · Power features and polish
 
-**Phase D · Quality and evaluation**
+**Quality and launch**
 
-- [ ] M28 · Hardening: accessibility, testing, security, performance
-- [ ] M29 · Round 2 testing and summative evaluation
-- [ ] M30 · Portfolio, presentation and v1.0.0 release
-
-## Academic context
-
-| | |
-| --- | --- |
-| Course | Human Computer Interaction (SE3223), BS Computer Science, Semester 5 |
-| Institution | Riphah International University, Faculty of Computing |
-| Session | Fall 2026 |
-| Instructor | Muhammad Shabbir Hassan |
+- [ ] M28 · Hardening
+- [ ] M29 · Usability benchmark
+- [ ] M30 · Launch v1.0.0
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). Usability problems are bugs too: please report them with the **Usability finding** issue template.
+Contributions are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md). Usability problems count as bugs: report them with the **Usability finding** issue form.
 
 ## License
 

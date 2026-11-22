@@ -1,14 +1,14 @@
 ## Summary
 
-<!-- What does this change do, and which module does it belong to (M01–M30)? -->
+<!-- What does this change do, and which roadmap milestone does it belong to (M01–M30)? -->
 
-Module: M
+Milestone: M
 
 Closes #
 
 ## Why
 
-<!-- The user need, research finding, usability issue or HCI principle behind this change. Link design-rationale records if any. -->
+<!-- The user need, research finding, usability issue or design principle behind this change. Link design-rationale records if any. -->
 
 ## How it was verified
 

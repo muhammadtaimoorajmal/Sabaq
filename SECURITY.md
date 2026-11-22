@@ -10,7 +10,7 @@ Include the steps to reproduce, the affected page or endpoint, and the impact yo
 
 ## Supported versions
 
-Only the latest version on the `main` branch (and the live deployment) receives security fixes.
+Only the latest version on the `main` branch (and the live deployment, once available) receives security fixes.
 
 ## Design commitments
 
