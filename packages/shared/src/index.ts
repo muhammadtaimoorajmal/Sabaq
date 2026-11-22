@@ -1,5 +1,6 @@
 // Schemas and types
 export * from './schemas/announcement.js';
+export * from './schemas/api.js';
 export * from './schemas/auth.js';
 export * from './schemas/class.js';
 export * from './schemas/common.js';

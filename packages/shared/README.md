@@ -12,6 +12,7 @@ Everything here is **pure**: no network, no database, no browser APIs. Domain lo
 
 | Module | Covers |
 | --- | --- |
+| `api` | The API's error format and error codes, health and readiness responses |
 | `common` | Identifiers, ISO dates, day keys, times of day, time zones, color tokens, URLs, pagination |
 | `user` | Users, preferences (theme, text size, density, language, motion, quiet hours …), profile updates |
 | `auth` | Registration, login, email verification, password reset and change |
