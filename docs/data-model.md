@@ -19,6 +19,8 @@ erDiagram
     COURSE ||--o{ STUDY_GROUP : "study groups"
     STUDY_GROUP ||--o{ JOIN_REQUEST : receives
     USER ||--o{ NOTIFICATION : receives
+    USER ||--o{ SESSION : "signed in on"
+    USER ||--o{ EMAIL_TOKEN : "e-mailed links"
 ```
 
 | Collection | Holds | Notes |
@@ -35,8 +37,8 @@ erDiagram
 | `study_groups` | Groups formed around a course | Members never exceed capacity; meet in person or online |
 | `study_group_join_requests` | Requests to join a group | One pending request per person per group |
 | `notifications` | In-app notifications as message keys and parameters | Translated by the interface; deleted automatically after 180 days |
-
-Authentication sessions and one-time e-mail tokens are added with the authentication API.
+| `sessions` | One signed-in device per document | Stores only the refresh token's hash; deleted automatically when expired |
+| `email_tokens` | Single-use links for e-mail verification and password reset | Stores only the token's hash; deleted automatically when expired |
 
 ## Indexes
 
@@ -56,6 +58,8 @@ Every index serves a screen or a rule:
 | `study_groups` | `classId + courseId`, `memberIds` | Browsing groups; "my groups" |
 | `study_group_join_requests` | `groupId + userId` (unique while pending), `groupId + status` | No duplicate requests; the owner's inbox |
 | `notifications` | `userId + deliverAt`, `userId + readAt`, `createdAt` (expires) | Notification list; unread count; automatic clean-up |
+| `sessions` | `tokenHash` (unique), `previousTokenHash`, `userId + revokedAt`, `expiresAt` (expires) | Refresh; theft detection; device list; automatic clean-up |
+| `email_tokens` | `tokenHash` (unique), `userId + purpose`, `expiresAt` (expires) | Opening a link; replacing older links; automatic clean-up |
 
 Indexes are created when the API connects; existing indexes are never dropped automatically.
 

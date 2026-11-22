@@ -3,7 +3,7 @@
 The Sabaq REST API: Node.js, Express 5 and TypeScript. It shares its validation schemas and domain logic with the web app through [`@sabaq/shared`](../../packages/shared/README.md).
 
 > [!NOTE]
-> The server and database are in place; authentication arrives in milestone 7. See the [roadmap](../../docs/roadmap.md).
+> The server, database and authentication are in place; feature endpoints arrive with each feature. See the [roadmap](../../docs/roadmap.md).
 
 ## Running locally
 
@@ -33,6 +33,26 @@ To use a persistent database, follow the [MongoDB Atlas guide](../../docs/guides
 | `GET /api/health` | **Liveness.** Answers instantly without touching any dependency, so the web app can also use it to wake a sleeping server |
 | `GET /api/health/ready` | **Readiness.** Pings the database and answers `503` when it is unreachable |
 | `GET /api` | Name and version of the API |
+
+### Authentication (`/api/auth`)
+
+| Method and path | Purpose |
+| --- | --- |
+| `POST /register` | Create an account (`name`, `email`, `password`, optional `studentId`); signs in and e-mails a verification link |
+| `POST /login` | Sign in with e-mail and password |
+| `POST /refresh` | Exchange the refresh cookie for a new access token (and a new cookie) |
+| `POST /logout` | Sign out this device |
+| `POST /logout-all` | Sign out every device |
+| `GET /me` | The signed-in user |
+| `GET /sessions` | Signed-in devices, such as "Chrome on Windows" |
+| `DELETE /sessions/:id` | Sign out one device |
+| `POST /verify-email` | Confirm an address with the token from the e-mailed link |
+| `POST /resend-verification` | Send a new verification link |
+| `POST /forgot-password` | E-mail a password reset link |
+| `POST /reset-password` | Set a new password with the token from the link; signs out every device |
+| `POST /change-password` | Change the password (needs the current one); signs out other devices |
+
+Sign-up, sign-in and refresh answer with `authResponseSchema` from `@sabaq/shared`. Routes that act on an e-mail address answer `202` whether or not an account exists, so they cannot be used to discover who has an account.
 
 ## Conventions
 
@@ -66,12 +86,36 @@ Never pass unvalidated input to a database query: validation guarantees that, fo
 
 Models, indexes and conventions are described in the [data model](../../docs/data-model.md). The API connects with automatic retries and exponential back-off, creates missing indexes on start-up, and closes the connection during graceful shutdown.
 
+## How sign-in works
+
+```mermaid
+sequenceDiagram
+    participant B as Browser
+    participant A as API
+    B->>A: POST /api/auth/login (e-mail, password)
+    A-->>B: access token (15 min) + HttpOnly refresh cookie (30 days)
+    B->>A: API requests with Authorization: Bearer <access token>
+    Note over B,A: The access token expires
+    B->>A: POST /api/auth/refresh (cookie sent automatically)
+    A-->>B: new access token + new refresh cookie (old one retired)
+```
+
+- **Access tokens** are short-lived signed tokens that the web app keeps in memory only. Every request also checks that the session is still active, so signing out takes effect immediately.
+- **Refresh tokens** live only in an `HttpOnly`, `SameSite=Strict` cookie limited to `/api/auth` (HTTPS-only in production). The database stores only their SHA-256 hash.
+- **Rotation with theft detection:** every refresh retires the old token. If a retired token is presented again after a 30-second grace period (which lets several open tabs refresh at once), it must have been copied, so the whole session is ended.
+- **Sessions** last 30 days from their last use.
+- **Brute-force protection:** a per-address rate limit on sensitive routes, and an account lock of 15 minutes after 5 failed sign-ins, reported with a clear message and a `Retry-After` header. A password reset also unlocks the account.
+- **No account discovery:** a wrong password and an unknown address produce the same message after the same amount of work.
+- **E-mailed links** carry their token in the URL fragment (`#token=…`), which browsers never send to servers. They are single-use, expire (verification after 24 hours, reset after 1 hour) and can be requested at most once a minute.
+- **Cross-site request forgery:** routes that rely on the cookie accept requests only from the web app's own origin.
+
 ## Security and operations
 
 | Concern | How it is handled |
 | --- | --- |
 | Configuration | Validated at startup; invalid settings stop the server with a message listing each problem. A database is mandatory in production |
-| Passwords | Argon2id with the parameters OWASP recommends |
+| Passwords | Argon2id with the parameters OWASP recommends; at least 8 characters and no arbitrary composition rules, following NIST guidance |
+| E-mail | Any SMTP provider ([Brevo guide](../../docs/guides/email-brevo.md)); messages in the recipient's language, including right-to-left Urdu. Without SMTP outside production, e-mails go to the log |
 | Headers | Helmet with a strict content security policy (`default-src 'none'`); `X-Powered-By` removed |
 | Cross-origin requests | Only origins listed in `CORS_ORIGINS` may send credentials |
 | Abuse | Per-client rate limit with standard `RateLimit` and `Retry-After` headers; the health check is exempt |
@@ -89,7 +133,9 @@ src/
 ├── app.ts            Builds the Express application (no side effects, used by tests)
 ├── server.ts         Listening and graceful shutdown
 ├── config/env.ts     Environment variables and their validation
+├── auth/             Sign-in, sessions, tokens, e-mail verification, passwords
 ├── db/               Connection, models, demo data
+├── mail/             E-mail delivery and templates
 ├── cli/              Command-line tools (seed)
 ├── lib/              Errors, logger, input validation, password hashing
 ├── middleware/       Request IDs, request logging, error handling

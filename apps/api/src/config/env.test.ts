@@ -3,7 +3,8 @@ import { ConfigError, isOrigin, loadConfig } from './env.js';
 
 describe('loadConfig', () => {
   it('applies safe development defaults', () => {
-    expect(loadConfig({})).toEqual({
+    const config = loadConfig({});
+    expect(config).toEqual({
       env: 'development',
       isProduction: false,
       host: '0.0.0.0',
@@ -16,7 +17,17 @@ describe('loadConfig', () => {
       shutdownTimeoutMs: 10_000,
       version: 'dev',
       database: { uri: null, name: 'sabaq' },
+      appUrl: 'http://localhost:5173',
+      auth: {
+        jwtSecret: expect.stringMatching(/^[\w-]{43}$/),
+        accessTokenTtlSeconds: 900,
+        refreshTokenTtlDays: 30,
+        rateLimitMax: 20,
+      },
+      mail: { from: 'Sabaq <no-reply@sabaq.local>', smtp: null },
     });
+    // A fresh random signing secret on every start outside production.
+    expect(loadConfig({}).auth.jwtSecret).not.toBe(config.auth.jwtSecret);
   });
 
   it('reads production settings and trusts one proxy by default', () => {
@@ -27,8 +38,20 @@ describe('loadConfig', () => {
       RENDER_GIT_COMMIT: '93917a8c0ffee',
       MONGODB_URI: 'mongodb+srv://app:secret@cluster0.example.mongodb.net/',
       MONGODB_DB_NAME: 'sabaq_demo',
+      APP_URL: 'https://sabaq.example.com',
+      JWT_SECRET: 'production-secret-that-is-long-enough-123',
+      SMTP_HOST: 'smtp-relay.example.com',
+      SMTP_USER: 'apikey',
+      SMTP_PASS: 'smtp-secret',
+      MAIL_FROM: 'Sabaq <no-reply@sabaq.example.com>',
     });
     expect(config).toMatchObject({
+      appUrl: 'https://sabaq.example.com',
+      auth: { jwtSecret: 'production-secret-that-is-long-enough-123' },
+      mail: {
+        from: 'Sabaq <no-reply@sabaq.example.com>',
+        smtp: { host: 'smtp-relay.example.com', port: 587, user: 'apikey', pass: 'smtp-secret' },
+      },
       database: {
         uri: 'mongodb+srv://app:secret@cluster0.example.mongodb.net/',
         name: 'sabaq_demo',
@@ -76,10 +99,31 @@ describe('loadConfig', () => {
 });
 
 describe('database settings', () => {
-  it('require a connection string in production', () => {
-    expect(() => loadConfig({ NODE_ENV: 'production' })).toThrow(
+  it('require a database, a signing secret and a mail server in production', () => {
+    let error: unknown;
+    try {
+      loadConfig({ NODE_ENV: 'production' });
+    } catch (caught) {
+      error = caught;
+    }
+    expect((error as ConfigError).problems).toEqual([
       'MONGODB_URI: is required in production',
-    );
+      'JWT_SECRET: is required in production',
+      'SMTP_HOST: is required in production',
+    ]);
+  });
+
+  it('reject short signing secrets and malformed web app addresses', () => {
+    let error: unknown;
+    try {
+      loadConfig({ JWT_SECRET: 'short', APP_URL: 'sabaq.example.com' });
+    } catch (caught) {
+      error = caught;
+    }
+    expect((error as ConfigError).problems).toEqual([
+      'APP_URL: must be the web app address, such as https://sabaq.example.com',
+      'JWT_SECRET: must be at least 32 characters long',
+    ]);
   });
 
   it('reject malformed connection strings and database names', () => {

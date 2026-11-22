@@ -1,3 +1,4 @@
+import { randomBytes } from 'node:crypto';
 import { z } from 'zod';
 
 export const NODE_ENVS = ['development', 'test', 'production'] as const;
@@ -51,18 +52,28 @@ export const envSchema = z
       .string()
       .regex(/^mongodb(?:\+srv)?:\/\/\S+$/, 'must start with mongodb:// or mongodb+srv://')
       .optional(),
+    APP_URL: z
+      .string()
+      .refine(isOrigin, 'must be the web app address, such as https://sabaq.example.com')
+      .default('http://localhost:5173'),
+    JWT_SECRET: z.string().min(32, 'must be at least 32 characters long').optional(),
+    AUTH_RATE_LIMIT_MAX: z.coerce.number().int().min(1).max(10_000).default(20),
+    SMTP_HOST: z.string().min(1).optional(),
+    SMTP_PORT: z.coerce.number().int().min(1).max(65_535).default(587),
+    SMTP_USER: z.string().min(1).optional(),
+    SMTP_PASS: z.string().min(1).optional(),
+    MAIL_FROM: z.string().min(3).default('Sabaq <no-reply@sabaq.local>'),
     MONGODB_DB_NAME: z
       .string()
       .regex(/^[\w-]{1,38}$/, 'use up to 38 letters, numbers, dashes or underscores')
       .default('sabaq'),
   })
   .superRefine((env, context) => {
-    if (env.NODE_ENV === 'production' && !env.MONGODB_URI) {
-      context.addIssue({
-        code: 'custom',
-        path: ['MONGODB_URI'],
-        message: 'is required in production',
-      });
+    if (env.NODE_ENV !== 'production') return;
+    for (const name of ['MONGODB_URI', 'JWT_SECRET', 'SMTP_HOST'] as const) {
+      if (!env[name]) {
+        context.addIssue({ code: 'custom', path: [name], message: 'is required in production' });
+      }
     }
   });
 
@@ -83,6 +94,21 @@ export interface Config {
     /** `null` outside production means: start a temporary in-memory database. */
     uri: string | null;
     name: string;
+  };
+  /** Public address of the web app, used in links inside e-mails. */
+  appUrl: string;
+  auth: {
+    /** Signs access tokens. Outside production a random secret is generated per start. */
+    jwtSecret: string;
+    accessTokenTtlSeconds: number;
+    refreshTokenTtlDays: number;
+    /** Attempts per client address per rate-limit window on sign-in and similar routes. */
+    rateLimitMax: number;
+  };
+  mail: {
+    from: string;
+    /** `null` outside production means: write e-mails to the log instead of sending them. */
+    smtp: { host: string; port: number; user: string | null; pass: string | null } | null;
   };
 }
 
@@ -127,5 +153,23 @@ export function loadConfig(source: Record<string, string | undefined> = process.
     shutdownTimeoutMs: env.SHUTDOWN_TIMEOUT_MS,
     version: env.APP_VERSION ?? env.RENDER_GIT_COMMIT?.slice(0, 7) ?? 'dev',
     database: { uri: env.MONGODB_URI ?? null, name: env.MONGODB_DB_NAME },
+    appUrl: env.APP_URL,
+    auth: {
+      jwtSecret: env.JWT_SECRET ?? randomBytes(32).toString('base64url'),
+      accessTokenTtlSeconds: 15 * 60,
+      refreshTokenTtlDays: 30,
+      rateLimitMax: env.AUTH_RATE_LIMIT_MAX,
+    },
+    mail: {
+      from: env.MAIL_FROM,
+      smtp: env.SMTP_HOST
+        ? {
+            host: env.SMTP_HOST,
+            port: env.SMTP_PORT,
+            user: env.SMTP_USER ?? null,
+            pass: env.SMTP_PASS ?? null,
+          }
+        : null,
+    },
   };
 }

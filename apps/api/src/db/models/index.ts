@@ -1,4 +1,5 @@
 import { AnnouncementModel, AnnouncementReceiptModel } from './announcement.js';
+import { EmailTokenModel, SessionModel } from './auth.js';
 import { ClassModel, MembershipModel } from './class.js';
 import { CourseModel } from './course.js';
 import { NotificationModel } from './notification.js';
@@ -8,6 +9,7 @@ import { TaskCompletionModel, TaskModel } from './task.js';
 import { UserModel } from './user.js';
 
 export * from './announcement.js';
+export * from './auth.js';
 export * from './class.js';
 export * from './course.js';
 export * from './notification.js';
@@ -30,4 +32,6 @@ export const ALL_MODELS = [
   StudyGroupModel,
   JoinRequestModel,
   NotificationModel,
+  SessionModel,
+  EmailTokenModel,
 ] as const;

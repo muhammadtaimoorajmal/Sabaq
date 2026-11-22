@@ -33,6 +33,11 @@ export interface UserRecord extends Timestamps {
   platformRole: PlatformRole;
   preferences: Preferences;
   lastLoginAt: Date | null;
+  /** Consecutive failed sign-ins; reset by a successful one. */
+  failedLoginCount: number;
+  /** Sign-in is refused until this time after too many failures. */
+  lockedUntil: Date | null;
+  passwordChangedAt: Date | null;
 }
 
 const defaults = DEFAULT_PREFERENCES;
@@ -72,6 +77,9 @@ const userSchema = new Schema<UserRecord>(
     platformRole: { type: String, enum: PLATFORM_ROLES, default: 'user' },
     preferences: { type: preferencesSchema, default: () => ({}) },
     lastLoginAt: { type: Date, default: null },
+    failedLoginCount: { type: Number, min: 0, default: 0 },
+    lockedUntil: { type: Date, default: null },
+    passwordChangedAt: { type: Date, default: null },
   },
   baseOptions('users'),
 );

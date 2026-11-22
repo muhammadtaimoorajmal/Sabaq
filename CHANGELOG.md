@@ -7,6 +7,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 
+- Authentication API: sign-up, sign-in, sign-out (one device or all), session refresh with rotating refresh tokens and theft detection, a list of signed-in devices, e-mail verification, forgotten and changed passwords; account lock after repeated failures, rate limits, and protection against account discovery and cross-site request forgery; bilingual e-mails (English and right-to-left Urdu) over SMTP, written to the log during development.
+- Shared contract additions: authentication error codes, `authResponseSchema` and `sessionInfoSchema`.
+- Documentation: the authentication design in the API guide, and an e-mail setup guide for Brevo.
 - Database layer (`apps/api`): MongoDB connection with retries and exponential back-off, readiness reporting and graceful disconnect; Mongoose models and purposeful indexes for users, classes, memberships, courses, tasks, completions, announcements, receipts, study slots, study groups, join requests and notifications; Argon2id password hashing; a fictional demo institution with dates relative to today, loadable with `npm run db:seed` behind safety checks; a temporary in-memory database with demo data when no `MONGODB_URI` is set; tests that run without network access.
 - `zonedDateTime` in `@sabaq/shared`: the instant of a wall-clock time in a time zone, with defined behavior across daylight-saving changes.
 - Documentation: data model and a MongoDB Atlas setup guide.

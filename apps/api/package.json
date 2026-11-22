@@ -14,8 +14,10 @@
     "db:seed": "tsx --conditions=@sabaq/source --env-file-if-exists=.env src/cli/seed.ts"
   },
   "devDependencies": {
+    "@types/cookie-parser": "1.4.10",
     "@types/cors": "2.8.19",
     "@types/express": "5.0.6",
+    "@types/nodemailer": "8.0.2",
     "@types/supertest": "7.2.1",
     "mongodb-memory-server-core": "11.4.0",
     "pino-pretty": "13.2.0",
@@ -25,11 +27,14 @@
   "dependencies": {
     "@node-rs/argon2": "2.2.2",
     "@sabaq/shared": "0.0.0",
+    "cookie-parser": "1.4.7",
     "cors": "2.8.6",
     "express": "5.3.0",
     "express-rate-limit": "8.7.5",
     "helmet": "8.3.0",
+    "jose": "6.2.18",
     "mongoose": "9.12.3",
+    "nodemailer": "10.6.1",
     "pino": "10.4.0",
     "pino-http": "11.0.0",
     "zod": "4.6.7"

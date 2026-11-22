@@ -5,12 +5,17 @@ export const STATUS_BY_CODE: Record<ApiErrorCode, number> = {
   validation_failed: 400,
   invalid_json: 400,
   unauthorized: 401,
+  session_expired: 401,
+  invalid_credentials: 401,
+  invalid_token: 400,
   forbidden: 403,
   not_found: 404,
   conflict: 409,
+  email_taken: 409,
   payload_too_large: 413,
   unsupported_media_type: 415,
   rate_limited: 429,
+  account_locked: 429,
   internal_error: 500,
   service_unavailable: 503,
 };
@@ -19,15 +24,18 @@ export const STATUS_BY_CODE: Record<ApiErrorCode, number> = {
 export class AppError extends Error {
   readonly status: number;
   readonly issues: FieldIssue[] | undefined;
+  /** Sent as the `Retry-After` header, for example while an account is locked. */
+  readonly retryAfterSeconds: number | undefined;
 
   constructor(
     readonly code: ApiErrorCode,
     message: string,
-    options: { issues?: FieldIssue[]; cause?: unknown } = {},
+    options: { issues?: FieldIssue[]; retryAfterSeconds?: number; cause?: unknown } = {},
   ) {
     super(message, { cause: options.cause });
     this.name = 'AppError';
     this.status = STATUS_BY_CODE[code];
     this.issues = options.issues;
+    this.retryAfterSeconds = options.retryAfterSeconds;
   }
 }

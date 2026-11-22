@@ -8,7 +8,7 @@ An open-source academic companion that brings every deadline, announcement and s
 
 [![CI](https://github.com/muhammadtaimoorajmal/Sabaq/actions/workflows/ci.yml/badge.svg)](https://github.com/muhammadtaimoorajmal/Sabaq/actions/workflows/ci.yml)
 [![Status](https://img.shields.io/badge/status-in%20development-orange)](docs/roadmap.md)
-[![Roadmap](https://img.shields.io/badge/roadmap-6%20of%2030%20milestones-blue)](#roadmap)
+[![Roadmap](https://img.shields.io/badge/roadmap-7%20of%2030%20milestones-blue)](#roadmap)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 [Vision](docs/vision.md) · [Roadmap](docs/roadmap.md) · [Documentation](docs/README.md) · [Contributing](CONTRIBUTING.md)
@@ -124,7 +124,7 @@ npm run check      # everything CI runs: format, lint, docs, types, tests
 | `npm run test` | Runs all tests with coverage (domain logic must stay at 100%) |
 | `npm run build` | Builds every workspace package |
 
-The API and its database are in place ([`apps/api`](apps/api/README.md), [data model](docs/data-model.md)); no database setup is needed for development. The web app arrives in later milestones; see the [roadmap](#roadmap).
+The API, its database and authentication are in place ([`apps/api`](apps/api/README.md), [data model](docs/data-model.md)); no database or e-mail setup is needed for development. The web app arrives in later milestones; see the [roadmap](#roadmap).
 
 ## Roadmap
 
@@ -141,7 +141,7 @@ Sabaq is built in 30 milestones, each verified before release. Details are in th
 
 - [x] M05 · API scaffold
 - [x] M06 · Database
-- [ ] M07 · Authentication API
+- [x] M07 · Authentication API
 
 **Research and design**
 

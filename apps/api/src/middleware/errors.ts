@@ -61,6 +61,9 @@ export const errorHandler: ErrorRequestHandler = (error: unknown, req, res, next
     // pino-http logs the response once, at error level, including this error and its stack.
     res.err = error instanceof Error ? error : new Error(String(error));
   }
+  if (known.retryAfterSeconds !== undefined) {
+    res.setHeader('Retry-After', String(known.retryAfterSeconds));
+  }
   const body: ApiError = {
     error: {
       code: known.code,

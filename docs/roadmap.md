@@ -75,7 +75,7 @@ For the product itself, see the [vision](vision.md).
 - **Done when:** the seed runs against Atlas; tests pass without network access.
 - **Requires:** a MongoDB Atlas account and a free cluster (step-by-step guide included).
 
-### M07 · Authentication API
+### M07 · Authentication API ✅
 
 - **Goal:** A secure, complete account lifecycle.
 - **Depends on:** M06.

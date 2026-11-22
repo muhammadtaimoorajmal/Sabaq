@@ -1,20 +1,27 @@
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { type Express, type RequestHandler } from 'express';
 import { rateLimit } from 'express-rate-limit';
 import helmet from 'helmet';
 import type { Logger } from 'pino';
+import { authRouter } from './auth/routes.js';
+import { AuthService } from './auth/service.js';
 import type { Config } from './config/env.js';
 import { AppError } from './lib/errors.js';
 import { errorHandler, notFound } from './middleware/errors.js';
 import { httpLogger, isHealthRequest } from './middleware/http-logger.js';
 import { REQUEST_ID_HEADER } from './middleware/request-id.js';
+import type { Mailer } from './mail/mailer.js';
 import { healthRouter, type HealthCheck } from './routes/health.js';
 
 export interface AppDependencies {
   config: Config;
   logger: Logger;
+  mailer: Mailer;
   /** Dependencies reported by `GET /api/health/ready`, such as the database. */
   healthChecks?: HealthCheck[];
+  /** The current time; replaced in tests to check expiry and lock-outs. */
+  now?: () => Date;
 }
 
 /** API responses can contain personal data, so browsers and proxies must not cache them. */
@@ -24,7 +31,13 @@ const noStore: RequestHandler = (_req, res, next) => {
 };
 
 /** Builds the Express application. Has no side effects, so tests can create as many as needed. */
-export function createApp({ config, logger, healthChecks = [] }: AppDependencies): Express {
+export function createApp({
+  config,
+  logger,
+  mailer,
+  healthChecks = [],
+  now = () => new Date(),
+}: AppDependencies): Express {
   const app = express();
   app.disable('x-powered-by');
   app.set('trust proxy', config.trustProxy);
@@ -65,11 +78,14 @@ export function createApp({ config, logger, healthChecks = [] }: AppDependencies
     }),
   );
   app.use(express.json({ limit: config.bodyLimit }));
+  app.use(cookieParser());
 
   app.get(['/', '/api'], (_req, res) => {
     res.json({ name: 'Sabaq API', version: config.version, health: '/api/health' });
   });
   app.use('/api', healthRouter({ version: config.version, checks: healthChecks }));
+  const auth = new AuthService({ config, mailer, logger, now });
+  app.use('/api/auth', authRouter({ service: auth, config, now }));
 
   app.use(notFound);
   app.use(errorHandler);

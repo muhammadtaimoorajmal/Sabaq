@@ -2,11 +2,14 @@ import { apiErrorSchema, healthSchema, readinessSchema } from '@sabaq/shared';
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 import { createApp } from './app.js';
-import { memoryLogger, testConfig } from './test/helpers.js';
+import { MemoryMailer, memoryLogger, testConfig } from './test/helpers.js';
 
 function makeApp(env: Record<string, string> = {}) {
   const { logger, entries } = memoryLogger();
-  return { app: createApp({ config: testConfig(env), logger }), entries };
+  return {
+    app: createApp({ config: testConfig(env), logger, mailer: new MemoryMailer() }),
+    entries,
+  };
 }
 
 describe('health', () => {
@@ -20,9 +23,11 @@ describe('health', () => {
   it('reports readiness of every dependency', async () => {
     const { logger } = memoryLogger();
     const config = testConfig();
+    const mailer = new MemoryMailer();
     const up = createApp({
       config,
       logger,
+      mailer,
       healthChecks: [{ name: 'database', check: () => Promise.resolve() }],
     });
     const ready = await request(up).get('/api/health/ready').expect(200);
@@ -34,6 +39,7 @@ describe('health', () => {
     const down = createApp({
       config,
       logger,
+      mailer,
       healthChecks: [
         { name: 'database', check: () => Promise.reject(new Error('connection refused')) },
         { name: 'mail', check: () => Promise.resolve() },

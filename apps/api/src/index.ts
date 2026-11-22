@@ -8,6 +8,7 @@ import { ConfigError, loadConfig, type Config } from './config/env.js';
 import { databaseHealthCheck } from './db/connection.js';
 import { setUpDatabase } from './db/setup.js';
 import { createLogger } from './lib/logger.js';
+import { createMailer } from './mail/mailer.js';
 import { startServer } from './server.js';
 
 function readConfig(): Config {
@@ -27,7 +28,8 @@ const logger = createLogger(config);
 
 try {
   const onShutdown = await setUpDatabase(config, logger);
-  const app = createApp({ config, logger, healthChecks: [databaseHealthCheck] });
+  const mailer = createMailer(config, logger);
+  const app = createApp({ config, logger, mailer, healthChecks: [databaseHealthCheck] });
   const running = await startServer({ app, config, logger, onShutdown });
   logger.info({ env: config.env, url: running.url }, `Sabaq API listening on ${running.url}`);
 
