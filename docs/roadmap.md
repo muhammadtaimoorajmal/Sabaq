@@ -85,7 +85,9 @@ For the product itself, see the [vision](vision.md).
 
 ## Research and design
 
-### M08 · Research synthesis
+### M08 · Research synthesis 🛠️
+
+> **Status:** analysis tools and synthesis structure are ready ([synthesis](research/synthesis/README.md)); findings are written once fieldwork data is committed.
 
 - **Goal:** Turn raw fieldwork into evidence.
 - **Depends on:** completed M02 fieldwork.

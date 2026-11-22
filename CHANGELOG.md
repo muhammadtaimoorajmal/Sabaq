@@ -7,6 +7,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 
+- Research synthesis tools: `npm run research:survey` validates the survey export against the questionnaire and writes a report with charts, tables, open answers and a verdict for each hypothesis using the pre-registered thresholds (refusing verdicts on too little data); `npm run lint:research` enforces that every insight cites at least two independent sources. Synthesis workspace for the affinity map, hypothesis verdicts and behavioral variables, and conventions for committing survey data.
 - Authentication API: sign-up, sign-in, sign-out (one device or all), session refresh with rotating refresh tokens and theft detection, a list of signed-in devices, e-mail verification, forgotten and changed passwords; account lock after repeated failures, rate limits, and protection against account discovery and cross-site request forgery; bilingual e-mails (English and right-to-left Urdu) over SMTP, written to the log during development.
 - Shared contract additions: authentication error codes, `authResponseSchema` and `sessionInfoSchema`.
 - Documentation: the authentication design in the API guide, and an e-mail setup guide for Brevo.

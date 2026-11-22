@@ -120,9 +120,11 @@ npm run check      # everything CI runs: format, lint, docs, types, tests
 | `npm run lint` | Lints code with ESLint, including accessibility rules for interface files |
 | `npm run lint:md` | Lints the documentation with markdownlint |
 | `npm run lint:links` | Verifies that every link and heading anchor in the documentation resolves |
+| `npm run lint:research` | Checks that every research insight cites at least two independent sources |
 | `npm run typecheck` | Type-checks with TypeScript in strict mode |
 | `npm run test` | Runs all tests with coverage (domain logic must stay at 100%) |
 | `npm run build` | Builds every workspace package |
+| `npm run research:survey` | Validates the survey export and writes the analysis with charts and hypothesis verdicts |
 
 The API, its database and authentication are in place ([`apps/api`](apps/api/README.md), [data model](docs/data-model.md)); no database or e-mail setup is needed for development. The web app arrives in later milestones; see the [roadmap](#roadmap).
 
@@ -145,7 +147,7 @@ Sabaq is built in 30 milestones, each verified before release. Details are in th
 
 **Research and design**
 
-- [ ] M08 · Research synthesis
+- [ ] M08 · Research synthesis (analysis tools ready; awaiting fieldwork data)
 - [ ] M09 · Personas, goals, task analysis, usability targets
 - [ ] M10 · Ideation and concept selection
 - [ ] M11 · Information architecture and low-fidelity prototype

@@ -27,9 +27,15 @@ Sabaq is designed from evidence, not assumptions. This folder holds everything n
 | [Artifact log](templates/artifact-log.md) | Redacted real announcements and instructions |
 | [Survey responses](templates/survey-responses.csv) | Column layout for the survey export |
 
-## Data
+## Data and synthesis
 
-Anonymized fieldwork goes into [`data/`](data/README.md). **Status:** fieldwork in progress; no data committed yet.
+| Folder | Contents |
+| --- | --- |
+| [`data/`](data/README.md) | Anonymized fieldwork: interview and observation notes, survey export, artifacts |
+| [`synthesis/`](synthesis/README.md) | Affinity map, hypothesis verdicts and behavioral variables |
+| [`findings/`](findings/README.md) | Generated reports, such as the survey analysis |
+
+**Status:** fieldwork in progress; no data committed yet. The analysis tools are ready: `npm run research:survey` analyzes the survey, and `npm run lint:research` checks that every insight has independent evidence.
 
 ## Fieldwork checklist
 

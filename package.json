@@ -26,12 +26,14 @@
     "lint": "eslint . --max-warnings=0",
     "lint:md": "markdownlint-cli2 \"**/*.md\" \"#node_modules\" \"#.course\"",
     "lint:links": "node scripts/check-links.mjs",
+    "lint:research": "node scripts/research/check-insights.mjs",
     "typecheck": "tsc -p tsconfig.json && npm run typecheck --workspaces --if-present",
     "test": "vitest run --coverage",
-    "check": "npm run format:check && npm run lint && npm run lint:md && npm run lint:links && npm run typecheck && npm run test && npm run build",
-    "prepare": "husky",
+    "test:watch": "vitest",
     "build": "npm run build --workspaces --if-present",
-    "test:watch": "vitest"
+    "check": "npm run format:check && npm run lint && npm run lint:md && npm run lint:links && npm run lint:research && npm run typecheck && npm run test && npm run build",
+    "research:survey": "node scripts/research/analyze-survey.mjs",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@commitlint/cli": "21.2.4",
