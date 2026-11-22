@@ -14,7 +14,7 @@ Thank you for helping make Sabaq better. This guide explains how to contribute; 
 
 1. Open or pick an issue. Use the **Usability finding** form for anything confusing, slow or inaccessible.
 2. Create a branch from `main`, for example `feat/join-class`, `fix/timeline-focus-order` or `docs/personas`.
-3. Make the change and run the project checks (format, lint, type check, tests) before pushing.
+3. Make the change and run `npm run check` before pushing. Git hooks already format and lint staged files and validate your commit message.
 4. Open a pull request using the template. Continuous integration must pass before merging.
 
 ## Commit messages
@@ -33,4 +33,4 @@ Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`
 
 ## Code style
 
-TypeScript runs in strict mode. Formatting and linting are automated with Prettier and ESLint, so style is never a matter of debate in review.
+TypeScript runs in strict mode. Formatting (Prettier), linting (ESLint with accessibility rules) and documentation checks (markdownlint and the link checker) are automated, so style is never a matter of debate in review. Install the editor extensions recommended in `.vscode/extensions.json` to get the same feedback while you type.

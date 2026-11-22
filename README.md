@@ -6,8 +6,9 @@
 
 An open-source academic companion that brings every deadline, announcement and submission rule into one structured place, so students stop missing deadlines and stop losing marks to avoidable mistakes.
 
+[![CI](https://github.com/muhammadtaimoorajmal/Sabaq/actions/workflows/ci.yml/badge.svg)](https://github.com/muhammadtaimoorajmal/Sabaq/actions/workflows/ci.yml)
 [![Status](https://img.shields.io/badge/status-in%20development-orange)](docs/roadmap.md)
-[![Roadmap](https://img.shields.io/badge/roadmap-2%20of%2030%20milestones-blue)](#roadmap)
+[![Roadmap](https://img.shields.io/badge/roadmap-3%20of%2030%20milestones-blue)](#roadmap)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 [Vision](docs/vision.md) · [Roadmap](docs/roadmap.md) · [Documentation](docs/README.md) · [Contributing](CONTRIBUTING.md)
@@ -102,9 +103,26 @@ Sabaq/
 
 ## Getting started
 
-Development setup instructions will be added together with the toolchain.
+**Requirements:** [Node.js](https://nodejs.org/) 22.12 or newer (see [`.nvmrc`](.nvmrc)) and Git.
 
-Requirements: **Node.js 22 LTS** or newer (see [`.nvmrc`](.nvmrc)) and Git.
+```bash
+git clone https://github.com/muhammadtaimoorajmal/Sabaq.git
+cd Sabaq
+npm install        # also installs the Git hooks
+npm run check      # everything CI runs: format, lint, docs, types, tests
+```
+
+| Script | What it does |
+| --- | --- |
+| `npm run check` | Runs every check below, exactly as continuous integration does |
+| `npm run format` | Formats code and configuration with Prettier |
+| `npm run lint` | Lints code with ESLint, including accessibility rules for interface files |
+| `npm run lint:md` | Lints the documentation with markdownlint |
+| `npm run lint:links` | Verifies that every link and heading anchor in the documentation resolves |
+| `npm run typecheck` | Type-checks with TypeScript in strict mode |
+| `npm run test` | Runs the test suites with Vitest |
+
+The application itself (web app and API) arrives in later milestones; see the [roadmap](#roadmap).
 
 ## Roadmap
 
@@ -114,7 +132,7 @@ Sabaq is built in 30 milestones, each verified before release. Details are in th
 
 - [x] M01 · Repository foundation
 - [x] M02 · User research kit
-- [ ] M03 · Tooling and continuous integration
+- [x] M03 · Tooling and continuous integration
 - [ ] M04 · Shared domain package
 
 **Backend core**

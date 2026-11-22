@@ -1,0 +1,8 @@
+# Markdown is checked by markdownlint instead
+*.md
+package-lock.json
+node_modules/
+dist/
+build/
+coverage/
+.course/

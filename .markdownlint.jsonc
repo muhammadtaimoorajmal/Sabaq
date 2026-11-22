@@ -6,5 +6,5 @@
   // README starts with an HTML block, not a heading
   "MD041": false,
   // Bold lines are used as small sub-headings inside lists
-  "MD036": false
+  "MD036": false,
 }

@@ -41,7 +41,7 @@ For the product itself, see the [vision](vision.md).
 - **Done when:** every research question is covered by at least two methods and every instrument maps to a hypothesis.
 - **Requires:** 5–7 interviews, 2–3 observation sessions and 30+ survey responses with real participants (runs in parallel with M03–M07).
 
-### M03 · Tooling and continuous integration
+### M03 · Tooling and continuous integration ✅
 
 - **Goal:** Make mistakes hard to commit.
 - **Depends on:** M01.

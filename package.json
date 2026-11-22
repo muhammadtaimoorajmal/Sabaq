@@ -1,0 +1,53 @@
+{
+  "name": "sabaq",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Open-source academic companion: every deadline, announcement and submission rule in one structured place.",
+  "license": "MIT",
+  "author": "Muhammad Taimoor Ajmal",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/muhammadtaimoorajmal/Sabaq.git"
+  },
+  "homepage": "https://github.com/muhammadtaimoorajmal/Sabaq#readme",
+  "bugs": "https://github.com/muhammadtaimoorajmal/Sabaq/issues",
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint . --max-warnings=0",
+    "lint:md": "markdownlint-cli2 \"**/*.md\" \"#node_modules\" \"#.course\"",
+    "lint:links": "node scripts/check-links.mjs",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "check": "npm run format:check && npm run lint && npm run lint:md && npm run lint:links && npm run typecheck && npm run test",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "21.2.4",
+    "@commitlint/config-conventional": "21.2.4",
+    "@eslint/js": "9.39.5",
+    "@types/node": "22.20.5",
+    "eslint": "9.39.5",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-jsx-a11y": "6.10.2",
+    "globals": "17.14.0",
+    "husky": "9.1.7",
+    "lint-staged": "17.6.2",
+    "markdownlint-cli2": "0.24.2",
+    "prettier": "3.10.1",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.73.0",
+    "vitest": "5.1.1"
+  },
+  "overrides": {
+    "katex": "0.19.1"
+  }
+}
