@@ -32,7 +32,7 @@ Everything here is **pure**: no network, no database, no browser APIs. Domain lo
 | `submission` | **Submission Checker**: compares a file's name, extension, size and timing with a task's rules and returns the exact file name to use |
 | `workload` | Daily workload per calendar day, load levels, and **deadline-clash assessment** with lighter-day suggestions |
 | `urgency` | Overdue / today / tomorrow / next 7 days / later, judged in the class's time zone |
-| `time` | Time-zone-correct calendar-day arithmetic, including daylight-saving transitions |
+| `time` | Time-zone-correct calendar-day arithmetic, and the instant of a wall-clock time in a time zone (such as 23:59 class time), including daylight-saving transitions |
 | `permissions` | The role-and-action matrix for students, class representatives, instructors and admins |
 | `join-code` | Secure, unambiguous class join codes |
 
