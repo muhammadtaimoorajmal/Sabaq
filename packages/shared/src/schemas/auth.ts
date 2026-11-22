@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { personNameSchema, studentIdSchema } from './user.js';
+import { idSchema, isoDateTimeSchema } from './common.js';
+import { personNameSchema, studentIdSchema, userSchema } from './user.js';
 
 /**
  * Password policy following NIST SP 800-63B: a minimum length and a generous maximum,
@@ -62,3 +63,26 @@ export const changePasswordInputSchema = z
     path: ['newPassword'],
   });
 export type ChangePasswordInput = z.infer<typeof changePasswordInputSchema>;
+
+/**
+ * Returned by sign-up, sign-in and session refresh. The access token is sent as
+ * `Authorization: Bearer <token>`; the long-lived refresh token travels only in an
+ * HTTP-only cookie that scripts cannot read.
+ */
+export const authResponseSchema = z.object({
+  user: userSchema,
+  accessToken: z.string().min(1),
+  accessTokenExpiresAt: isoDateTimeSchema,
+});
+export type AuthResponse = z.infer<typeof authResponseSchema>;
+
+/** One signed-in device, as listed on the account security page. */
+export const sessionInfoSchema = z.object({
+  id: idSchema,
+  /** A readable description such as "Chrome on Windows". */
+  device: z.string(),
+  current: z.boolean(),
+  createdAt: isoDateTimeSchema,
+  lastUsedAt: isoDateTimeSchema,
+});
+export type SessionInfo = z.infer<typeof sessionInfoSchema>;
