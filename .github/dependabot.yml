@@ -13,6 +13,18 @@ updates:
       development-tooling:
         dependency-type: development
         update-types: [minor, patch]
+    ignore:
+      # eslint-plugin-jsx-a11y supports ESLint up to 9; upgrade together once it supports 10.
+      - dependency-name: eslint
+        update-types: [version-update:semver-major]
+      - dependency-name: '@eslint/js'
+        update-types: [version-update:semver-major]
+      # typescript-eslint supports TypeScript below 6.1; upgrade together once it supports 7.
+      - dependency-name: typescript
+        update-types: [version-update:semver-major]
+      # Type definitions must match the Node.js major version we run on (see .nvmrc).
+      - dependency-name: '@types/node'
+        update-types: [version-update:semver-major]
 
   - package-ecosystem: github-actions
     directory: /
