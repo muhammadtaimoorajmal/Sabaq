@@ -132,7 +132,7 @@ For the product itself, see the [vision](vision.md).
 - **Deliverables:** design tokens (color, type, spacing, radius, elevation, motion); light, dark and high-contrast themes; fluid type scale that follows the user's text-size preference; comfortable and compact density; reduced motion; accessible component library (button, input, select, checkbox, radio, switch, dialog, sheet, tabs, toast, tooltip, badge, card, empty state, skeleton, avatar, date picker); a living style-guide page.
 - **Done when:** every text and color pair meets WCAG 2.2 AA (AAA in high contrast); every component works by keyboard; zero automated accessibility violations.
 
-### M14 · App shell
+### M14 · App shell ✅
 
 - **Goal:** The frame every screen lives in.
 - **Depends on:** M13.

@@ -429,6 +429,7 @@ export function DesignSystemPage() {
           <div className="grid gap-4 md:grid-cols-2">
             <Card>
               <EmptyState
+                headingLevel={3}
                 icon={<CalendarCheck />}
                 title={t('designSystem.sample.emptyTitle')}
                 action={

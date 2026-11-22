@@ -8,7 +8,7 @@ An open-source academic companion that brings every deadline, announcement and s
 
 [![CI](https://github.com/muhammadtaimoorajmal/Sabaq/actions/workflows/ci.yml/badge.svg)](https://github.com/muhammadtaimoorajmal/Sabaq/actions/workflows/ci.yml)
 [![Status](https://img.shields.io/badge/status-in%20development-orange)](docs/roadmap.md)
-[![Roadmap](https://img.shields.io/badge/roadmap-8%20of%2030%20milestones-blue)](#roadmap)
+[![Roadmap](https://img.shields.io/badge/roadmap-9%20of%2030%20milestones-blue)](#roadmap)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 [Vision](docs/vision.md) · [Roadmap](docs/roadmap.md) · [Documentation](docs/README.md) · [Contributing](CONTRIBUTING.md)
@@ -126,10 +126,11 @@ npm run check      # everything CI runs: format, lint, docs, types, tests
 | `npm run lint:research` | Checks that every research insight cites at least two independent sources |
 | `npm run typecheck` | Type-checks with TypeScript in strict mode |
 | `npm run test` | Runs all tests with coverage (domain logic must stay at 100%) |
+| `npm run test:e2e` | Runs the end-to-end tests in a real browser: user journeys, keyboard access, accessibility scans with color contrast, small screens and Lighthouse |
 | `npm run build` | Builds every workspace package |
 | `npm run research:survey` | Validates the survey export and writes the analysis with charts and hypothesis verdicts |
 
-The API, its database and authentication are in place ([`apps/api`](apps/api/README.md), [data model](docs/data-model.md)), and so is the web app's [design system](docs/design-system/README.md) ([`apps/web`](apps/web/README.md)). No database or e-mail setup is needed for development. Product screens arrive in the next milestones; see the [roadmap](#roadmap).
+The API, its database and authentication are in place ([`apps/api`](apps/api/README.md), [data model](docs/data-model.md)), and so is the web app's [design system](docs/design-system/README.md) and app shell ([`apps/web`](apps/web/README.md)): sign in with a demo account, navigation, settings and signed-in devices. No database or e-mail setup is needed for development. Product screens arrive in the next milestones; see the [roadmap](#roadmap).
 
 ## Roadmap
 
@@ -159,7 +160,7 @@ Sabaq is built in 30 milestones, each verified before release. Details are in th
 **Frontend foundation**
 
 - [x] M13 · Design system
-- [ ] M14 · App shell
+- [x] M14 · App shell
 - [ ] M15 · Authentication screens
 - [ ] M16 · Deployment
 

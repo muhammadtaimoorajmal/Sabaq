@@ -28,7 +28,10 @@ export function createI18n(language: Language = 'en'): i18n {
 }
 
 /** The translation key for an API error code, falling back to a generic message. */
-export function errorKey(code: string | undefined): `errors.${ApiErrorCode | 'unknown'}` {
+export function errorKey(
+  code: string | undefined,
+): `errors.${ApiErrorCode | 'network' | 'unknown'}` {
+  if (code === 'network') return 'errors.network';
   return (API_ERROR_CODES as readonly string[]).includes(code ?? '')
     ? `errors.${code as ApiErrorCode}`
     : 'errors.unknown';

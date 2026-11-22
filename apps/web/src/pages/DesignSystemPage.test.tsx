@@ -1,8 +1,18 @@
 import type { PreferencesUpdate } from '@sabaq/shared';
 import { screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { App } from '../app/App';
+import { SkipLink } from '../components/ui';
+import { DesignSystemPage } from './DesignSystemPage';
 import { accessibilityViolations, renderWithProviders } from '../test/render';
+
+function Page() {
+  return (
+    <>
+      <SkipLink />
+      <DesignSystemPage />
+    </>
+  );
+}
 
 describe('design system page', () => {
   it.each<[string, PreferencesUpdate]>([
@@ -11,12 +21,12 @@ describe('design system page', () => {
     ['high contrast', { theme: 'high-contrast', textScale: 1.5 }],
     ['Urdu, right to left', { language: 'ur' }],
   ])('has no detectable accessibility violations (%s)', async (_name, preferences) => {
-    renderWithProviders(<App />, preferences);
+    renderWithProviders(<Page />, preferences);
     expect(await accessibilityViolations()).toEqual([]);
   });
 
   it('starts with a skip link to the main content', async () => {
-    const { user } = renderWithProviders(<App />);
+    const { user } = renderWithProviders(<Page />);
     await user.tab();
     const skip = screen.getByRole('link', { name: 'Skip to main content' });
     expect(skip).toHaveFocus();
@@ -24,7 +34,7 @@ describe('design system page', () => {
   });
 
   it('applies display settings to the whole page immediately', async () => {
-    const { user } = renderWithProviders(<App />);
+    const { user } = renderWithProviders(<Page />);
     const root = document.documentElement;
 
     await user.click(screen.getByRole('radio', { name: 'Dark' }));
@@ -55,7 +65,7 @@ describe('design system page', () => {
   });
 
   it('validates the sample form and lists every problem', async () => {
-    const { user } = renderWithProviders(<App />);
+    const { user } = renderWithProviders(<Page />);
     await user.click(screen.getByRole('button', { name: 'Create account' }));
     const summary = screen.getByRole('alert');
     expect(summary).toHaveTextContent('There are 3 problems to fix');
@@ -69,7 +79,7 @@ describe('design system page', () => {
   });
 
   it('shows a busy state on the sample submit button', async () => {
-    const { user } = renderWithProviders(<App />);
+    const { user } = renderWithProviders(<Page />);
     const [submit] = screen.getAllByRole('button', { name: 'Submit' });
     await user.click(submit as HTMLElement);
     expect(screen.getByRole('button', { name: 'Submitting…' })).toHaveAttribute(
@@ -79,7 +89,7 @@ describe('design system page', () => {
   });
 
   it('clamps the text size to the supported range', async () => {
-    const { user } = renderWithProviders(<App />, { textScale: 1.5 });
+    const { user } = renderWithProviders(<Page />, { textScale: 1.5 });
     expect(screen.getByRole('button', { name: 'Larger text' })).toBeDisabled();
     await user.click(screen.getByRole('button', { name: 'Reset text size' }));
     expect(document.documentElement.style.getPropertyValue('--text-scale')).toBe('1');

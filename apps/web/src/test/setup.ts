@@ -1,9 +1,18 @@
 import '@testing-library/jest-dom/vitest';
 import { cleanup } from '@testing-library/react';
-import { afterEach, vi } from 'vitest';
+import { afterEach, beforeEach, vi } from 'vitest';
+import { mockApi, resetClient } from './api';
+
+beforeEach(() => {
+  // Every test starts signed out, with a healthy API; tests replace routes as needed.
+  mockApi();
+});
 
 afterEach(() => {
   cleanup();
+  resetClient();
+  systemMedia.clear();
+  vi.unstubAllGlobals();
   localStorage.clear();
   document.documentElement.removeAttribute('style');
   for (const name of ['data-theme', 'data-density', 'data-motion', 'lang', 'dir']) {

@@ -268,3 +268,11 @@
 @utility border-b-default {
   border-bottom-width: var(--border-width, 1px);
 }
+
+@utility border-t-default {
+  border-top-width: var(--border-width, 1px);
+}
+
+@utility border-e-default {
+  border-inline-end-width: var(--border-width, 1px);
+}

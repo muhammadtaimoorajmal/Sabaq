@@ -17,6 +17,8 @@ const IGNORED_DIRECTORIES = new Set([
   'build',
   'coverage',
   '.course',
+  'test-results',
+  'playwright-report',
 ]);
 const EXTERNAL_LINK = /^(?:[a-z][a-z\d+.-]*:|\/\/)/i;
 

@@ -6,3 +6,5 @@ dist/
 build/
 coverage/
 .course/
+test-results
+playwright-report

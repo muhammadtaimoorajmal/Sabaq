@@ -161,14 +161,18 @@ export function EmptyState({
   title,
   children,
   action,
+  headingLevel = 2,
   className,
 }: {
   icon?: ReactNode;
   title: ReactNode;
   children?: ReactNode;
   action?: ReactNode;
+  /** Keep the page outline intact: one level below the surrounding heading. */
+  headingLevel?: 2 | 3 | 4;
   className?: string;
 }) {
+  const Heading = `h${headingLevel}` as const;
   return (
     <div className={cn('flex flex-col items-center gap-3 px-6 py-10 text-center', className)}>
       {icon && (
@@ -179,7 +183,7 @@ export function EmptyState({
           {icon}
         </span>
       )}
-      <h3 className="text-lg font-semibold text-text">{title}</h3>
+      <Heading className="text-lg font-semibold text-text">{title}</Heading>
       {children && <p className="max-w-sm text-muted">{children}</p>}
       {action}
     </div>
