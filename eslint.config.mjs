@@ -1,6 +1,7 @@
 import js from '@eslint/js';
 import prettier from 'eslint-config-prettier';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
+import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
@@ -36,6 +37,11 @@ export default tseslint.config(
       ...jsxA11y.flatConfigs.strict.languageOptions,
       globals: { ...globals.browser },
     },
+  },
+  {
+    // React's rules of hooks and the React Compiler's correctness checks
+    files: ['**/*.{jsx,tsx}'],
+    ...reactHooks.configs.flat['recommended-latest'],
   },
   {
     // Command-line scripts may print to the console

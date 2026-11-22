@@ -125,7 +125,7 @@ For the product itself, see the [vision](vision.md).
 
 ## Frontend foundation
 
-### M13 · Design system
+### M13 · Design system ✅
 
 - **Goal:** A consistent, accessible visual language.
 - **Depends on:** M12.

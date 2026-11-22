@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Sabaq: every deadline, announcement and submission rule in one calm place."
+    />
+    <meta name="theme-color" content="#f7f8fa" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f1419" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>Sabaq</title>
+    <script>
+      // Apply saved display preferences before the first paint, so the page never flashes
+      // in the wrong theme, size or direction. Kept in sync with src/preferences/preferences.ts.
+      (function () {
+        try {
+          var saved = JSON.parse(localStorage.getItem('sabaq.preferences') || '{}');
+          var root = document.documentElement;
+          var dark = matchMedia('(prefers-color-scheme: dark)').matches;
+          var more = matchMedia('(prefers-contrast: more)').matches;
+          var theme =
+            saved.theme && saved.theme !== 'system'
+              ? saved.theme
+              : more
+                ? 'high-contrast'
+                : dark
+                  ? 'dark'
+                  : 'light';
+          root.dataset.theme = theme;
+          root.dataset.density = saved.density || 'comfortable';
+          if (saved.textScale) root.style.setProperty('--text-scale', String(saved.textScale));
+          if (saved.language === 'ur') {
+            root.lang = 'ur';
+            root.dir = 'rtl';
+          }
+        } catch (error) {
+          /* Defaults apply. */
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <noscript>Sabaq needs JavaScript to run. Please enable it in your browser.</noscript>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

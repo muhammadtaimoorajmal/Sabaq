@@ -15,9 +15,14 @@ export default defineConfig({
     ],
     coverage: {
       provider: 'v8',
-      include: ['packages/*/src/**/*.ts', 'apps/api/src/**/*.ts', 'scripts/**/*.mjs'],
+      include: [
+        'packages/*/src/**/*.ts',
+        'apps/api/src/**/*.ts',
+        'apps/web/src/**/*.{ts,tsx}',
+        'scripts/**/*.mjs',
+      ],
       // Entry points only wire tested modules together; test helpers are not product code.
-      exclude: ['**/*.test.*', '**/index.ts', '**/src/test/**'],
+      exclude: ['**/*.test.*', '**/index.ts', '**/main.tsx', '**/src/test/**'],
       reporter: ['text', 'html', 'lcov'],
       thresholds: {
         // Domain logic decides what students see and whether a submission is safe: no gaps.

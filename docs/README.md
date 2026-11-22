@@ -12,7 +12,7 @@ Sabaq is designed with its users, and the design process is documented here alon
 | [design/](design/README.md) | Personas, task analysis, concepts, information architecture and wireframes |
 | [design-rationale/](design-rationale/README.md) | Records explaining every significant design decision |
 | [testing/](testing/README.md) | Usability test plans and reports, accessibility audits and benchmarks |
-| [design-system/](design-system/README.md) | Visual language and style guide |
+| [design-system/](design-system/README.md) | Tokens, themes, personalization, components and their accessibility evidence |
 
 ## Design process
 
