@@ -60,11 +60,11 @@ For the product itself, see the [vision](vision.md).
 
 ## Backend core
 
-### M05 · API scaffold
+### M05 · API scaffold ✅
 
 - **Goal:** A production-grade server skeleton.
 - **Depends on:** M04.
-- **Deliverables:** Express + TypeScript; configuration validated at startup with clear messages; structured logging with request IDs; consistent error format; security headers, CORS allow-list, rate limits, body-size limits; health endpoint including database status; graceful shutdown; tests.
+- **Deliverables:** Express + TypeScript; configuration validated at startup with clear messages; structured logging with request IDs; consistent error format; security headers, CORS allow-list, rate limits, body-size limits; liveness and readiness endpoints (readiness reports database status once M06 adds it); graceful shutdown; tests.
 - **Done when:** the server runs locally; tests and CI pass.
 
 ### M06 · Database

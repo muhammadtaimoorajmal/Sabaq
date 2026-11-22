@@ -8,7 +8,7 @@ An open-source academic companion that brings every deadline, announcement and s
 
 [![CI](https://github.com/muhammadtaimoorajmal/Sabaq/actions/workflows/ci.yml/badge.svg)](https://github.com/muhammadtaimoorajmal/Sabaq/actions/workflows/ci.yml)
 [![Status](https://img.shields.io/badge/status-in%20development-orange)](docs/roadmap.md)
-[![Roadmap](https://img.shields.io/badge/roadmap-4%20of%2030%20milestones-blue)](#roadmap)
+[![Roadmap](https://img.shields.io/badge/roadmap-5%20of%2030%20milestones-blue)](#roadmap)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 [Vision](docs/vision.md) · [Roadmap](docs/roadmap.md) · [Documentation](docs/README.md) · [Contributing](CONTRIBUTING.md)
@@ -114,6 +114,7 @@ npm run check      # everything CI runs: format, lint, docs, types, tests
 
 | Script | What it does |
 | --- | --- |
+| `npm run dev:api` | Starts the API at `http://localhost:4000` with automatic restarts |
 | `npm run check` | Runs every check below, exactly as continuous integration does |
 | `npm run format` | Formats code and configuration with Prettier |
 | `npm run lint` | Lints code with ESLint, including accessibility rules for interface files |
@@ -123,7 +124,7 @@ npm run check      # everything CI runs: format, lint, docs, types, tests
 | `npm run test` | Runs all tests with coverage (domain logic must stay at 100%) |
 | `npm run build` | Builds every workspace package |
 
-The application itself (web app and API) arrives in later milestones; see the [roadmap](#roadmap).
+The API foundation is in place ([`apps/api`](apps/api/README.md)); the web app arrives in later milestones; see the [roadmap](#roadmap).
 
 ## Roadmap
 
@@ -138,7 +139,7 @@ Sabaq is built in 30 milestones, each verified before release. Details are in th
 
 **Backend core**
 
-- [ ] M05 · API scaffold
+- [x] M05 · API scaffold
 - [ ] M06 · Database
 - [ ] M07 · Authentication API
 

@@ -1,0 +1,33 @@
+{
+  "name": "@sabaq/api",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Sabaq REST API.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "scripts": {
+    "dev": "tsx watch --conditions=@sabaq/source --env-file-if-exists=.env src/index.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node --enable-source-maps dist/index.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@types/cors": "2.8.19",
+    "@types/express": "5.0.6",
+    "@types/supertest": "7.2.1",
+    "pino-pretty": "13.2.0",
+    "supertest": "7.3.2",
+    "tsx": "4.23.15"
+  },
+  "dependencies": {
+    "@sabaq/shared": "0.0.0",
+    "cors": "2.8.6",
+    "express": "5.3.0",
+    "express-rate-limit": "8.7.5",
+    "helmet": "8.3.0",
+    "pino": "10.4.0",
+    "pino-http": "11.0.0",
+    "zod": "4.6.7"
+  }
+}

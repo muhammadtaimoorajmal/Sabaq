@@ -13,13 +13,14 @@
   "bugs": "https://github.com/muhammadtaimoorajmal/Sabaq/issues",
   "type": "module",
   "workspaces": [
-    "apps/*",
-    "packages/*"
+    "packages/*",
+    "apps/*"
   ],
   "engines": {
     "node": ">=22.12.0"
   },
   "scripts": {
+    "dev:api": "npm run dev -w @sabaq/api",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint . --max-warnings=0",

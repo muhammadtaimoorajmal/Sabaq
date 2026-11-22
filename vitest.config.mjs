@@ -11,11 +11,13 @@ export default defineConfig({
         },
       },
       'packages/*/vitest.config.ts',
+      'apps/*/vitest.config.ts',
     ],
     coverage: {
       provider: 'v8',
-      include: ['packages/*/src/**/*.ts', 'scripts/**/*.mjs'],
-      exclude: ['**/*.test.*', '**/index.ts'],
+      include: ['packages/*/src/**/*.ts', 'apps/api/src/**/*.ts', 'scripts/**/*.mjs'],
+      // Entry points only wire tested modules together; test helpers are not product code.
+      exclude: ['**/*.test.*', '**/index.ts', '**/src/test/**'],
       reporter: ['text', 'html', 'lcov'],
       thresholds: {
         // Domain logic decides what students see and whether a submission is safe: no gaps.

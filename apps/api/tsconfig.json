@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "customConditions": ["@sabaq/source"],
+    "types": ["node"],
+    "noEmit": true
+  },
+  "include": ["src", "vitest.config.ts"]
+}
