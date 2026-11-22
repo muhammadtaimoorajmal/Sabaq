@@ -1,0 +1,10 @@
+{
+  // Long lines are normal in prose and tables
+  "MD013": false,
+  // Inline HTML is used for the centered README header
+  "MD033": false,
+  // README starts with an HTML block, not a heading
+  "MD041": false,
+  // Bold lines are used as small sub-headings inside lists
+  "MD036": false
+}

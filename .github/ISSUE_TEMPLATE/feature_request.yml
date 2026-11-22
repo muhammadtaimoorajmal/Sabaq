@@ -1,0 +1,28 @@
+name: Feature request
+description: Suggest an improvement grounded in a real user need.
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: Which user need does this address?
+      description: Who needs it (student, CR, instructor, admin), and what problem do they have today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Options you rejected and why (this becomes the design rationale).
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Research findings, test observations or principles that support this.

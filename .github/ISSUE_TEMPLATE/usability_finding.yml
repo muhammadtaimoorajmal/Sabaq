@@ -1,0 +1,86 @@
+name: Usability finding
+description: Something in the interface is confusing, slow, inaccessible or error-prone.
+title: "[Usability] "
+labels: ["usability"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you. Usability problems are treated as bugs in Sabaq.
+        Describe what happened from the user's point of view; no technical knowledge is needed.
+  - type: input
+    id: screen
+    attributes:
+      label: Screen or feature
+      placeholder: "e.g. Submission Checker, Today screen"
+    validations:
+      required: true
+  - type: textarea
+    id: task
+    attributes:
+      label: What were you (or the participant) trying to do?
+      placeholder: "e.g. Check whether my Lab 11 file name was correct"
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: What happened?
+      description: Include quotes from think-aloud sessions if you have them (participants anonymized as P1, P2 …).
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What was expected?
+    validations:
+      required: true
+  - type: dropdown
+    id: heuristic
+    attributes:
+      label: Nielsen heuristic violated
+      multiple: true
+      options:
+        - "H1 Visibility of system status"
+        - "H2 Match between system and the real world"
+        - "H3 User control and freedom"
+        - "H4 Consistency and standards"
+        - "H5 Error prevention"
+        - "H6 Recognition rather than recall"
+        - "H7 Flexibility and efficiency of use"
+        - "H8 Aesthetic and minimalist design"
+        - "H9 Help users recognize, diagnose and recover from errors"
+        - "H10 Help and documentation"
+        - "Accessibility (WCAG)"
+        - "Not sure"
+    validations:
+      required: true
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity (Nielsen scale)
+      options:
+        - "0 Not a usability problem"
+        - "1 Cosmetic: fix if time allows"
+        - "2 Minor: low priority"
+        - "3 Major: important to fix"
+        - "4 Catastrophe: must fix before release"
+    validations:
+      required: true
+  - type: dropdown
+    id: source
+    attributes:
+      label: Where was this found?
+      options:
+        - "Think-aloud session"
+        - "Heuristic evaluation"
+        - "Summative test"
+        - "Accessibility audit"
+        - "Everyday use"
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Device, browser and settings
+      placeholder: "e.g. Android phone, Chrome, dark theme, Urdu, large text"
