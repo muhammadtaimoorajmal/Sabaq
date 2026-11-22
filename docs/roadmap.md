@@ -48,7 +48,7 @@ For the product itself, see the [vision](vision.md).
 - **Deliverables:** npm workspaces; strict shared TypeScript configuration; ESLint (including accessibility rules) and Prettier; pre-commit hooks; commit-message linting; GitHub Actions running format → lint → typecheck → test → build on every push and pull request; Dependabot.
 - **Done when:** `npm run check` passes locally and in CI.
 
-### M04 · Shared domain package
+### M04 · Shared domain package ✅
 
 - **Goal:** One source of truth for data shapes and business rules, used by both web and API.
 - **Depends on:** M03.

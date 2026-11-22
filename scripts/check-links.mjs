@@ -138,17 +138,26 @@ export function checkLinks(root) {
   return { files: files.length, links, problems };
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const root = path.resolve(process.argv[2] ?? '.');
-  const report = checkLinks(root);
+/**
+ * Command-line entry point. Prints a report and returns the process exit code.
+ * @param {string[]} args
+ * @param {{ log: (message: string) => void, error: (message: string) => void }} output
+ * @returns {number}
+ */
+export function runCli(args, output) {
+  const report = checkLinks(path.resolve(args[0] ?? '.'));
   for (const problem of report.problems) {
-    console.error(`✖ ${problem.file}: ${problem.link} (${problem.reason})`);
+    output.error(`✖ ${problem.file}: ${problem.link} (${problem.reason})`);
   }
   const summary = `${report.links} links in ${report.files} files, ${report.problems.length} broken`;
   if (report.problems.length > 0) {
-    console.error(summary);
-    process.exitCode = 1;
-  } else {
-    console.log(`✔ ${summary}`);
+    output.error(summary);
+    return 1;
   }
+  output.log(`✔ ${summary}`);
+  return 0;
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  process.exitCode = runCli(process.argv.slice(2), console);
 }

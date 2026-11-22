@@ -8,7 +8,7 @@ An open-source academic companion that brings every deadline, announcement and s
 
 [![CI](https://github.com/muhammadtaimoorajmal/Sabaq/actions/workflows/ci.yml/badge.svg)](https://github.com/muhammadtaimoorajmal/Sabaq/actions/workflows/ci.yml)
 [![Status](https://img.shields.io/badge/status-in%20development-orange)](docs/roadmap.md)
-[![Roadmap](https://img.shields.io/badge/roadmap-3%20of%2030%20milestones-blue)](#roadmap)
+[![Roadmap](https://img.shields.io/badge/roadmap-4%20of%2030%20milestones-blue)](#roadmap)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 [Vision](docs/vision.md) · [Roadmap](docs/roadmap.md) · [Documentation](docs/README.md) · [Contributing](CONTRIBUTING.md)
@@ -120,7 +120,8 @@ npm run check      # everything CI runs: format, lint, docs, types, tests
 | `npm run lint:md` | Lints the documentation with markdownlint |
 | `npm run lint:links` | Verifies that every link and heading anchor in the documentation resolves |
 | `npm run typecheck` | Type-checks with TypeScript in strict mode |
-| `npm run test` | Runs the test suites with Vitest |
+| `npm run test` | Runs all tests with coverage (domain logic must stay at 100%) |
+| `npm run build` | Builds every workspace package |
 
 The application itself (web app and API) arrives in later milestones; see the [roadmap](#roadmap).
 
@@ -133,7 +134,7 @@ Sabaq is built in 30 milestones, each verified before release. Details are in th
 - [x] M01 · Repository foundation
 - [x] M02 · User research kit
 - [x] M03 · Tooling and continuous integration
-- [ ] M04 · Shared domain package
+- [x] M04 · Shared domain package
 
 **Backend core**
 

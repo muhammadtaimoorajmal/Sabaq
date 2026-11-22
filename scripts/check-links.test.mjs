@@ -2,7 +2,14 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { checkLinks, collectAnchors, extractLinks, slugify, stripCode } from './check-links.mjs';
+import {
+  checkLinks,
+  collectAnchors,
+  extractLinks,
+  runCli,
+  slugify,
+  stripCode,
+} from './check-links.mjs';
 
 describe('slugify', () => {
   it.each([
@@ -81,5 +88,27 @@ describe('checkLinks', () => {
     mkdirSync(path.join(root, 'node_modules'));
     writeFileSync(path.join(root, 'node_modules', 'x.md'), '[broken](nowhere.md)\n');
     expect(checkLinks(root).problems).toEqual([]);
+  });
+
+  it('reports success and failure through the command line with exit codes', () => {
+    /** @type {string[]} */
+    const lines = [];
+    const output = {
+      /** @param {string} message */
+      log: (message) => lines.push(`log: ${message}`),
+      /** @param {string} message */
+      error: (message) => lines.push(`error: ${message}`),
+    };
+
+    writeFileSync(path.join(root, 'README.md'), '[guide](docs/guide.md)\n');
+    expect(runCli([root], output)).toBe(0);
+    expect(lines.pop()).toBe('log: ✔ 1 links in 2 files, 0 broken');
+
+    writeFileSync(path.join(root, 'README.md'), '[gone](docs/missing.md)\n');
+    expect(runCli([root], output)).toBe(1);
+    expect(lines.slice(-2)).toEqual([
+      'error: ✖ README.md: docs/missing.md (target does not exist)',
+      'error: 1 links in 2 files, 1 broken',
+    ]);
   });
 });
