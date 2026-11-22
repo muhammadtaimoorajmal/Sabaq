@@ -34,19 +34,37 @@ const originListSchema = z
   );
 
 /** Environment variables read by the API. Every variable is documented in `.env.example`. */
-export const envSchema = z.object({
-  NODE_ENV: z.enum(NODE_ENVS).default('development'),
-  HOST: z.string().min(1).default('0.0.0.0'),
-  PORT: z.coerce.number().int().min(1).max(65_535).default(4000),
-  LOG_LEVEL: z.enum(LOG_LEVELS).optional(),
-  CORS_ORIGINS: originListSchema,
-  TRUST_PROXY: z.coerce.number().int().min(0).max(10).optional(),
-  RATE_LIMIT_WINDOW_MINUTES: z.coerce.number().int().min(1).max(1440).default(15),
-  RATE_LIMIT_MAX: z.coerce.number().int().min(1).max(100_000).default(300),
-  SHUTDOWN_TIMEOUT_MS: z.coerce.number().int().min(1000).max(60_000).default(10_000),
-  APP_VERSION: z.string().min(1).optional(),
-  RENDER_GIT_COMMIT: z.string().min(7).optional(),
-});
+export const envSchema = z
+  .object({
+    NODE_ENV: z.enum(NODE_ENVS).default('development'),
+    HOST: z.string().min(1).default('0.0.0.0'),
+    PORT: z.coerce.number().int().min(1).max(65_535).default(4000),
+    LOG_LEVEL: z.enum(LOG_LEVELS).optional(),
+    CORS_ORIGINS: originListSchema,
+    TRUST_PROXY: z.coerce.number().int().min(0).max(10).optional(),
+    RATE_LIMIT_WINDOW_MINUTES: z.coerce.number().int().min(1).max(1440).default(15),
+    RATE_LIMIT_MAX: z.coerce.number().int().min(1).max(100_000).default(300),
+    SHUTDOWN_TIMEOUT_MS: z.coerce.number().int().min(1000).max(60_000).default(10_000),
+    APP_VERSION: z.string().min(1).optional(),
+    RENDER_GIT_COMMIT: z.string().min(7).optional(),
+    MONGODB_URI: z
+      .string()
+      .regex(/^mongodb(?:\+srv)?:\/\/\S+$/, 'must start with mongodb:// or mongodb+srv://')
+      .optional(),
+    MONGODB_DB_NAME: z
+      .string()
+      .regex(/^[\w-]{1,38}$/, 'use up to 38 letters, numbers, dashes or underscores')
+      .default('sabaq'),
+  })
+  .superRefine((env, context) => {
+    if (env.NODE_ENV === 'production' && !env.MONGODB_URI) {
+      context.addIssue({
+        code: 'custom',
+        path: ['MONGODB_URI'],
+        message: 'is required in production',
+      });
+    }
+  });
 
 export interface Config {
   env: NodeEnv;
@@ -61,6 +79,11 @@ export interface Config {
   bodyLimit: string;
   shutdownTimeoutMs: number;
   version: string;
+  database: {
+    /** `null` outside production means: start a temporary in-memory database. */
+    uri: string | null;
+    name: string;
+  };
 }
 
 /** Thrown when the environment is invalid; the message lists every problem at once. */
@@ -103,5 +126,6 @@ export function loadConfig(source: Record<string, string | undefined> = process.
     bodyLimit: '100kb',
     shutdownTimeoutMs: env.SHUTDOWN_TIMEOUT_MS,
     version: env.APP_VERSION ?? env.RENDER_GIT_COMMIT?.slice(0, 7) ?? 'dev',
+    database: { uri: env.MONGODB_URI ?? null, name: env.MONGODB_DB_NAME },
   };
 }

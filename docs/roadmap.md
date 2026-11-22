@@ -67,7 +67,7 @@ For the product itself, see the [vision](vision.md).
 - **Deliverables:** Express + TypeScript; configuration validated at startup with clear messages; structured logging with request IDs; consistent error format; security headers, CORS allow-list, rate limits, body-size limits; liveness and readiness endpoints (readiness reports database status once M06 adds it); graceful shutdown; tests.
 - **Done when:** the server runs locally; tests and CI pass.
 
-### M06 · Database
+### M06 · Database ✅
 
 - **Goal:** Persistent, well-indexed data in the cloud.
 - **Depends on:** M05.

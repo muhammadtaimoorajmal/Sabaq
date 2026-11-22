@@ -1,9 +1,12 @@
 /**
- * Entry point: validate configuration, start the server and handle process signals.
+ * Entry point: validate configuration, connect to the database, start the server and handle
+ * process signals.
  * Everything with logic lives in tested modules; this file only wires them together.
  */
 import { createApp } from './app.js';
 import { ConfigError, loadConfig, type Config } from './config/env.js';
+import { databaseHealthCheck } from './db/connection.js';
+import { setUpDatabase } from './db/setup.js';
 import { createLogger } from './lib/logger.js';
 import { startServer } from './server.js';
 
@@ -23,7 +26,9 @@ const config = readConfig();
 const logger = createLogger(config);
 
 try {
-  const running = await startServer({ app: createApp({ config, logger }), config, logger });
+  const onShutdown = await setUpDatabase(config, logger);
+  const app = createApp({ config, logger, healthChecks: [databaseHealthCheck] });
+  const running = await startServer({ app, config, logger, onShutdown });
   logger.info({ env: config.env, url: running.url }, `Sabaq API listening on ${running.url}`);
 
   const stop = (reason: string, exitCode: number) => {

@@ -6,6 +6,8 @@ Sabaq is designed with its users, and the design process is documented here alon
 | --- | --- |
 | [vision.md](vision.md) | The problem, the product, what is new, users, architecture and technology |
 | [roadmap.md](roadmap.md) | The 30 milestones, with deliverables and completion criteria |
+| [data-model.md](data-model.md) | Collections, relationships, indexes and the demo data |
+| [guides/](guides/mongodb-atlas.md) | Setup guides: [MongoDB Atlas](guides/mongodb-atlas.md) |
 | [research/](research/README.md) | User research: plan, instruments, anonymized data and synthesis |
 | [design/](design/README.md) | Personas, task analysis, concepts, information architecture and wireframes |
 | [design-rationale/](design-rationale/README.md) | Records explaining every significant design decision |

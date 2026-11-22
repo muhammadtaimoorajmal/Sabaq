@@ -3,7 +3,7 @@
 The Sabaq REST API: Node.js, Express 5 and TypeScript. It shares its validation schemas and domain logic with the web app through [`@sabaq/shared`](../../packages/shared/README.md).
 
 > [!NOTE]
-> This is the server foundation. The database arrives in milestone 6 and authentication in milestone 7; see the [roadmap](../../docs/roadmap.md).
+> The server and database are in place; authentication arrives in milestone 7. See the [roadmap](../../docs/roadmap.md).
 
 ## Running locally
 
@@ -14,13 +14,16 @@ npm install
 npm run dev:api      # http://localhost:4000, restarts on every change
 ```
 
-Development mode reads `@sabaq/shared` straight from its TypeScript sources, so changes there apply immediately without a build. To change a setting, copy [`.env.example`](.env.example) to `.env`.
+No database or account is needed: without `MONGODB_URI`, development mode starts a temporary MongoDB on your computer and fills it with [demo data](../../docs/data-model.md#demo-data). The first start downloads MongoDB once (it is cached afterwards); changes are lost when the server stops.
+
+To use a persistent database, follow the [MongoDB Atlas guide](../../docs/guides/mongodb-atlas.md) and copy [`.env.example`](.env.example) to `.env`. Development mode reads `@sabaq/shared` straight from its TypeScript sources, so changes there apply immediately without a build.
 
 | Command (from the repository root) | What it does |
 | --- | --- |
 | `npm run dev:api` | Starts the API with automatic restarts and readable logs |
 | `npm run build` | Compiles every package, including the API, to `dist/` |
 | `npm start -w @sabaq/api` | Runs the compiled API, as in production |
+| `npm run db:seed -w @sabaq/api` | Loads the demo institution into the database in `MONGODB_URI` (add `-- --reset` to replace existing Sabaq data) |
 | `npm test` | Runs all tests with coverage |
 
 ## Endpoints
@@ -28,7 +31,7 @@ Development mode reads `@sabaq/shared` straight from its TypeScript sources, so 
 | Method and path | Purpose |
 | --- | --- |
 | `GET /api/health` | **Liveness.** Answers instantly without touching any dependency, so the web app can also use it to wake a sleeping server |
-| `GET /api/health/ready` | **Readiness.** Checks every dependency (the database, from milestone 6) and answers `503` when one is down |
+| `GET /api/health/ready` | **Readiness.** Pings the database and answers `503` when it is unreachable |
 | `GET /api` | Name and version of the API |
 
 ## Conventions
@@ -57,11 +60,18 @@ Every unsuccessful response has the same shape, defined by `apiErrorSchema` in `
 
 Route handlers validate input with `parseInput(schema, input)` using the shared Zod schemas. Invalid input produces a `validation_failed` error listing every invalid field at once, so forms can mark them all together.
 
+Never pass unvalidated input to a database query: validation guarantees that, for example, an e-mail is a string and not an object such as `{ "$ne": null }`.
+
+### Data
+
+Models, indexes and conventions are described in the [data model](../../docs/data-model.md). The API connects with automatic retries and exponential back-off, creates missing indexes on start-up, and closes the connection during graceful shutdown.
+
 ## Security and operations
 
 | Concern | How it is handled |
 | --- | --- |
-| Configuration | Validated at startup; invalid settings stop the server with a message listing each problem |
+| Configuration | Validated at startup; invalid settings stop the server with a message listing each problem. A database is mandatory in production |
+| Passwords | Argon2id with the parameters OWASP recommends |
 | Headers | Helmet with a strict content security policy (`default-src 'none'`); `X-Powered-By` removed |
 | Cross-origin requests | Only origins listed in `CORS_ORIGINS` may send credentials |
 | Abuse | Per-client rate limit with standard `RateLimit` and `Retry-After` headers; the health check is exempt |
@@ -79,7 +89,9 @@ src/
 ├── app.ts            Builds the Express application (no side effects, used by tests)
 ├── server.ts         Listening and graceful shutdown
 ├── config/env.ts     Environment variables and their validation
-├── lib/              Errors, logger, input validation
+├── db/               Connection, models, demo data
+├── cli/              Command-line tools (seed)
+├── lib/              Errors, logger, input validation, password hashing
 ├── middleware/       Request IDs, request logging, error handling
 ├── routes/           One router per feature
 └── test/             Test helpers

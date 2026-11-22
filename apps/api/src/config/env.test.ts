@@ -15,6 +15,7 @@ describe('loadConfig', () => {
       bodyLimit: '100kb',
       shutdownTimeoutMs: 10_000,
       version: 'dev',
+      database: { uri: null, name: 'sabaq' },
     });
   });
 
@@ -24,8 +25,14 @@ describe('loadConfig', () => {
       PORT: '10000',
       CORS_ORIGINS: ' https://sabaq.example.com/ , http://localhost:5173',
       RENDER_GIT_COMMIT: '93917a8c0ffee',
+      MONGODB_URI: 'mongodb+srv://app:secret@cluster0.example.mongodb.net/',
+      MONGODB_DB_NAME: 'sabaq_demo',
     });
     expect(config).toMatchObject({
+      database: {
+        uri: 'mongodb+srv://app:secret@cluster0.example.mongodb.net/',
+        name: 'sabaq_demo',
+      },
       isProduction: true,
       port: 10_000,
       logLevel: 'info',
@@ -65,6 +72,27 @@ describe('loadConfig', () => {
     ]);
     expect(message).toContain('"example.com" is not an origin');
     expect(message.startsWith('Invalid configuration:\n  - ')).toBe(true);
+  });
+});
+
+describe('database settings', () => {
+  it('require a connection string in production', () => {
+    expect(() => loadConfig({ NODE_ENV: 'production' })).toThrow(
+      'MONGODB_URI: is required in production',
+    );
+  });
+
+  it('reject malformed connection strings and database names', () => {
+    let error: unknown;
+    try {
+      loadConfig({ MONGODB_URI: 'postgres://db', MONGODB_DB_NAME: 'my db' });
+    } catch (caught) {
+      error = caught;
+    }
+    expect((error as ConfigError).problems).toEqual([
+      'MONGODB_URI: must start with mongodb:// or mongodb+srv://',
+      'MONGODB_DB_NAME: use up to 38 letters, numbers, dashes or underscores',
+    ]);
   });
 });
 
