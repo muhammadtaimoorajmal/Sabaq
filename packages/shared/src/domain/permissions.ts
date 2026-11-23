@@ -27,8 +27,15 @@ const STUDENT: readonly ClassAction[] = [
   'study_group.create',
 ];
 
+/**
+ * Class representatives run the class day to day: courses, announcements, the roster and the
+ * join code. Only instructors can change or remove other instructors (enforced by the API).
+ */
 const CLASS_REP: readonly ClassAction[] = [
   ...STUDENT,
+  'class.update',
+  'class.regenerate_join_code',
+  'class.manage_members',
   'course.manage',
   'announcement.create',
   'announcement.view_receipts',

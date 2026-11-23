@@ -16,11 +16,14 @@ describe('can', () => {
     expect(can(student, 'class.manage_members')).toBe(false);
   });
 
-  it('lets class representatives post and organize, but not manage the class', () => {
+  it('lets class representatives run the class, but not delete it or manage others’ posts', () => {
     const rep = member('class_rep');
     expect(can(rep, 'announcement.create')).toBe(true);
     expect(can(rep, 'announcement.view_receipts')).toBe(true);
     expect(can(rep, 'course.manage')).toBe(true);
+    expect(can(rep, 'class.update')).toBe(true);
+    expect(can(rep, 'class.manage_members')).toBe(true);
+    expect(can(rep, 'class.regenerate_join_code')).toBe(true);
     expect(can(rep, 'announcement.manage_any')).toBe(false);
     expect(can(rep, 'class.delete')).toBe(false);
   });

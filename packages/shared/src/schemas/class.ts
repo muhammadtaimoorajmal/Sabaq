@@ -20,6 +20,8 @@ export const joinCodeSchema = z
 export const classSchema = z.object({
   id: idSchema,
   name: shortText(80),
+  /** Section or group within the program, such as "5A"; used in file-naming rules. */
+  section: shortText(20).nullable(),
   program: shortText(120),
   term: shortText(60),
   institution: shortText(120).nullable(),
@@ -37,16 +39,26 @@ export const classForMemberSchema = classSchema.extend({
 });
 export type ClassForMember = z.infer<typeof classForMemberSchema>;
 
-export const createClassInputSchema = z.object({
+/** The roles someone creating a class can take; students join with a code instead. */
+export const CREATOR_ROLES = ['class_rep', 'instructor'] as const;
+
+const classFields = {
   name: shortText(80),
+  section: shortText(20).optional(),
   program: shortText(120),
   term: shortText(60),
   institution: shortText(120).optional(),
   timeZone: timeZoneSchema,
+};
+
+export const createClassInputSchema = z.object({
+  ...classFields,
+  /** The creator's own role in the class. */
+  myRole: z.enum(CREATOR_ROLES).default('class_rep'),
 });
 export type CreateClassInput = z.infer<typeof createClassInputSchema>;
 
-export const updateClassInputSchema = createClassInputSchema.partial();
+export const updateClassInputSchema = z.object(classFields).partial();
 export type UpdateClassInput = z.infer<typeof updateClassInputSchema>;
 
 export const joinClassInputSchema = z.object({ code: joinCodeSchema });
