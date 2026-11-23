@@ -16,6 +16,8 @@ import {
 
 export interface ClassRecord extends Timestamps {
   name: string;
+  /** Section or group, such as "5A". */
+  section: string | null;
   program: string;
   term: string;
   institution: string | null;
@@ -30,6 +32,7 @@ export interface ClassRecord extends Timestamps {
 const classSchema = new Schema<ClassRecord>(
   {
     name: { type: String, required: true, trim: true, maxlength: 80 },
+    section: nullableString(20),
     program: { type: String, required: true, trim: true, maxlength: 120 },
     term: { type: String, required: true, trim: true, maxlength: 60 },
     institution: nullableString(120),

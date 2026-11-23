@@ -70,6 +70,34 @@ export const routes: RouteObject[] = [
             lazy: () => import('../pages/TodayPage').then((m) => ({ Component: m.TodayPage })),
           },
           {
+            path: 'classes',
+            handle: handle('classes.title'),
+            lazy: () =>
+              import('../pages/classes/ClassesPage').then((m) => ({ Component: m.ClassesPage })),
+          },
+          {
+            path: 'classes/new',
+            handle: handle('classes.form.createTitle'),
+            lazy: () =>
+              import('../pages/classes/CreateClassPage').then((m) => ({
+                Component: m.CreateClassPage,
+              })),
+          },
+          {
+            path: 'classes/:classId',
+            handle: handle('classes.title'),
+            lazy: () =>
+              import('../pages/classes/ClassPage').then((m) => ({ Component: m.ClassPage })),
+          },
+          {
+            path: 'join',
+            handle: handle('classes.joinPage.title'),
+            lazy: () =>
+              import('../pages/classes/JoinClassPage').then((m) => ({
+                Component: m.JoinClassPage,
+              })),
+          },
+          {
             path: 'settings',
             handle: handle('nav.settings'),
             lazy: () =>

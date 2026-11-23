@@ -113,6 +113,7 @@ export async function seedDemoData({
   await ClassModel.create({
     _id: classId,
     name: 'BS Computer Science · 5A',
+    section: '5A',
     program: 'BS Computer Science',
     term: termOf(now),
     institution: 'Northfield University',

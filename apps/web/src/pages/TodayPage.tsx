@@ -1,7 +1,9 @@
 import { CalendarCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useClasses } from '../api/classes';
 import { useCurrentUser } from '../auth/AuthProvider';
 import { EmptyState } from '../components/ui';
+import { ClassActions, ClassCard } from './classes/ClassesPage';
 
 /** The part of the day in the person's own time zone. */
 export function partOfDay(now: Date, timeZone: string): 'morning' | 'afternoon' | 'evening' {
@@ -25,6 +27,7 @@ export function greetingName(fullName: string): string {
 export function TodayPage({ now = new Date() }: { now?: Date }) {
   const { t, i18n } = useTranslation();
   const user = useCurrentUser();
+  const classes = useClasses();
   const { timeZone } = user.preferences;
   const date = new Intl.DateTimeFormat(i18n.language, { dateStyle: 'full', timeZone }).format(now);
 
@@ -36,13 +39,27 @@ export function TodayPage({ now = new Date() }: { now?: Date }) {
           {t(`today.${partOfDay(now, timeZone)}`, { name: greetingName(user.name) })}
         </h1>
       </header>
-      <EmptyState
-        icon={<CalendarCheck />}
-        title={t('today.emptyTitle')}
-        className="rounded-xl border-default border-dashed border-border-strong"
-      >
-        {t('today.emptyBody')}
-      </EmptyState>
+      {classes.data && classes.data.length > 0 ? (
+        <section aria-labelledby="today-classes" className="flex flex-col gap-3">
+          <h2 id="today-classes" className="text-xl font-bold text-text">
+            {t('classes.title')}
+          </h2>
+          <ul className="flex flex-col gap-3">
+            {classes.data.map((cls) => (
+              <ClassCard key={cls.id} cls={cls} />
+            ))}
+          </ul>
+        </section>
+      ) : (
+        <EmptyState
+          icon={<CalendarCheck />}
+          title={t('today.emptyTitle')}
+          action={classes.data ? <ClassActions /> : undefined}
+          className="rounded-xl border-default border-dashed border-border-strong"
+        >
+          {t('today.emptyBody')}
+        </EmptyState>
+      )}
     </div>
   );
 }

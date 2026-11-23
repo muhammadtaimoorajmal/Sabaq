@@ -1,5 +1,6 @@
 export { Avatar, colorOf, initialsOf } from './Avatar';
 export { Button, type ButtonProps, buttonVariants } from './Button';
+export { ConfirmDialog } from './ConfirmDialog';
 export { Checkbox, type Option, RadioGroup, SegmentedControl, Slider, Switch } from './Choice';
 export { DateTimeField, type DateTimeFieldProps } from './DateTimeField';
 export { ErrorSummary, type FormError } from './ErrorSummary';

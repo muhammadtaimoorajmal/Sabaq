@@ -40,7 +40,13 @@ export function issueKey(field: string, code: string, value: string, message = '
   return 'auth.validation.invalid';
 }
 
-export type FieldErrors<Field extends string> = Partial<Record<Field, Key>>;
+export type FieldErrors<Field extends string> = Partial<Record<Field, ParseKeys>>;
+
+/** Plain messages for ordinary text fields: missing, or too long. */
+export function generalIssueKey(_field: string, code: string, value: string): ParseKeys {
+  if (value.trim() === '') return 'classes.form.required';
+  return code === 'too_big' ? 'classes.form.tooLong' : 'auth.validation.invalid';
+}
 
 /** Validates form values with a shared schema; one message per field, in field order. */
 export function validate<Field extends string>(
@@ -48,6 +54,7 @@ export function validate<Field extends string>(
   values: Record<Field, string>,
   /** Turns form values into the schema's input, for example "" into "not given". */
   prepare: (values: Record<Field, string>) => unknown = (input) => input,
+  describe: (field: string, code: string, value: string, message: string) => ParseKeys = issueKey,
 ): FieldErrors<Field> {
   const result = schema.safeParse(prepare(values));
   if (result.success) return {};
@@ -55,7 +62,7 @@ export function validate<Field extends string>(
   for (const issue of result.error.issues) {
     const field = String(issue.path[0] ?? '') as Field;
     if (!(field in values) || errors[field]) continue;
-    errors[field] = issueKey(field, issue.code, values[field], issue.message);
+    errors[field] = describe(field, issue.code, values[field], issue.message);
   }
   return errors;
 }

@@ -43,6 +43,7 @@ const DEFAULTS: Handlers = {
   'GET /api/health': () => json(200, { status: 'ok' }),
   'POST /api/auth/refresh': () => apiError(401, 'session_expired'),
   'POST /api/auth/logout': () => json(204),
+  'GET /api/classes': () => json(200, []),
 };
 
 /**

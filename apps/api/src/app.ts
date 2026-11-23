@@ -4,8 +4,11 @@ import express, { type Express, type RequestHandler } from 'express';
 import { rateLimit } from 'express-rate-limit';
 import helmet from 'helmet';
 import type { Logger } from 'pino';
+import { requireAuth } from './auth/middleware.js';
 import { authRouter } from './auth/routes.js';
 import { AuthService } from './auth/service.js';
+import { classesRouter } from './classes/routes.js';
+import { ClassService } from './classes/service.js';
 import type { Config } from './config/env.js';
 import { AppError } from './lib/errors.js';
 import { errorHandler, notFound } from './middleware/errors.js';
@@ -87,6 +90,8 @@ export function createApp({
   app.use('/api', healthRouter({ version: config.version, checks: healthChecks }));
   const auth = new AuthService({ config, mailer, logger, now });
   app.use('/api/auth', authRouter({ service: auth, config, now }));
+  const authenticated = requireAuth({ service: auth, secret: config.auth.jwtSecret, now });
+  app.use('/api/classes', classesRouter({ service: new ClassService(), authenticated }));
   if (!config.isProduction && mailer.outbox) {
     app.use('/api', devRouter({ outbox: mailer.outbox }));
   }

@@ -50,7 +50,9 @@ export function useForm<Field extends string>({
     field: (field: Field) => ({
       name: field,
       value: values[field],
-      onChange: (event: ChangeEvent<HTMLInputElement>) => {
+      onChange: (
+        event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
+      ) => {
         const value = event.target.value;
         setValues((current) => ({ ...current, [field]: value }));
         setServer((current) => ({ ...current, [field]: undefined }));

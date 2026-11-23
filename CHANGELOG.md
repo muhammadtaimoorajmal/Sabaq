@@ -7,6 +7,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 
+- Classes and membership: create a class (with section, term, institution and time zone) as its class representative or instructor; invite with a join code, a link that fills it in, the device's share sheet or a QR code, and replace the code when needed; join in one tap; members by role with role changes, removal and leaving (a class always keeps a manager; only instructors appoint or change instructors); courses with a weekly timetable, colors and duplicate-code protection; permission checks on every endpoint with clear refusals. A new student joins from a shared link in under 30 seconds, verified end to end.
 - Account screens: create an account (with a password strength meter that discourages common passwords, personal details and patterns), confirm the e-mail address from the e-mailed link or a reminder banner, sign in (Caps Lock warning, the remaining minutes of a locked account, optional one-tap demo accounts), forgotten and reset passwords, and change password in settings. Validation in plain language appears after leaving a field or on submit and clears as soon as a problem is fixed; forms work with password managers.
 - A development mailbox (`GET /api/dev/mail`) that keeps the e-mails the API would have sent when no e-mail service is configured; never available in production.
 - App shell: routes that load on demand, with protected pages that return people to their destination after signing in; an API client that renews sessions silently and shares one renewal between parallel requests; cached server data; an honest connection banner for a waking server or a lost connection; a header with display settings and an account menu; sidebar navigation on wide screens and a bottom bar on phones; announced page changes (title and focus); error pages with recovery and support references, a not-found page, and a last-resort error screen; a sign-in page; settings with display preferences and signed-in devices (sign out one or all).
@@ -31,6 +32,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- Class representatives can now edit the class, manage members and replace the join code, so classes they create can be run without an instructor account.
 - The error summary takes focus once per submit attempt instead of whenever its contents change, so correcting a field never moves focus away from it.
 - The greeting keeps a title with the first name ("Dr. Ayesha" rather than "Dr.").
 - Continuous integration caches the MongoDB binary used by the database tests.

@@ -53,6 +53,27 @@ To use a persistent database, follow the [MongoDB Atlas guide](../../docs/guides
 | `POST /reset-password` | Set a new password with the token from the link; signs out every device |
 | `POST /change-password` | Change the password (needs the current one); signs out other devices |
 
+### Classes (`/api/classes`)
+
+Every route needs a session. People outside a class get `404`, so class identifiers reveal nothing; members without permission get `403` with a message saying who may do it.
+
+| Method and path | Purpose | Who |
+| --- | --- | --- |
+| `GET /` | My classes, with my role and the member count | Anyone |
+| `POST /` | Create a class (`myRole`: class representative or instructor) | Anyone |
+| `POST /join` | Join with a code (case and separators ignored); joining again just opens the class | Anyone |
+| `GET /:id` | The class, including its join code | Members |
+| `PATCH /:id` | Edit name, section, program, term, institution, time zone | Instructors, class representatives |
+| `DELETE /:id` | Remove (archive) the class for everyone | Instructors, the creator |
+| `POST /:id/join-code` | Replace the join code; the old one stops working | Instructors, class representatives |
+| `GET /:id/members` | Members by role, then name | Members |
+| `PATCH /:id/members/:userId` | Change a role; only instructors appoint or change instructors | Instructors, class representatives |
+| `DELETE /:id/members/:userId` | Remove someone, or leave (your own id) | Managers; anyone for themselves |
+| `GET /:id/courses` | Courses with their weekly timetable | Members |
+| `POST`, `PATCH`, `DELETE /:id/courses/…` | Manage courses; codes are unique per class, ignoring case | Instructors, class representatives |
+
+A class always keeps at least one instructor or class representative: the last one cannot leave or step down (`last_manager`).
+
 Sign-up, sign-in and refresh answer with `authResponseSchema` from `@sabaq/shared`. Routes that act on an e-mail address answer `202` whether or not an account exists, so they cannot be used to discover who has an account.
 
 ## Conventions
@@ -135,6 +156,7 @@ src/
 ├── server.ts         Listening and graceful shutdown
 ├── config/env.ts     Environment variables and their validation
 ├── auth/             Sign-in, sessions, tokens, e-mail verification, passwords
+├── classes/          Classes, memberships, roles and courses
 ├── db/               Connection, models, demo data
 ├── mail/             E-mail delivery and templates
 ├── cli/              Command-line tools (seed)
