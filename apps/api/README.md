@@ -33,6 +33,7 @@ To use a persistent database, follow the [MongoDB Atlas guide](../../docs/guides
 | `GET /api/health` | **Liveness.** Answers instantly without touching any dependency, so the web app can also use it to wake a sleeping server |
 | `GET /api/health/ready` | **Readiness.** Pings the database and answers `503` when it is unreachable |
 | `GET /api` | Name and version of the API |
+| `GET /api/dev/mail` | **Development only.** The e-mails the API would have sent (newest first; filter with `?to=`), so verification and password links can be opened without a mail account. Never available in production or when SMTP is configured |
 
 ### Authentication (`/api/auth`)
 

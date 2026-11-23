@@ -7,6 +7,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 
+- Account screens: create an account (with a password strength meter that discourages common passwords, personal details and patterns), confirm the e-mail address from the e-mailed link or a reminder banner, sign in (Caps Lock warning, the remaining minutes of a locked account, optional one-tap demo accounts), forgotten and reset passwords, and change password in settings. Validation in plain language appears after leaving a field or on submit and clears as soon as a problem is fixed; forms work with password managers.
+- A development mailbox (`GET /api/dev/mail`) that keeps the e-mails the API would have sent when no e-mail service is configured; never available in production.
 - App shell: routes that load on demand, with protected pages that return people to their destination after signing in; an API client that renews sessions silently and shares one renewal between parallel requests; cached server data; an honest connection banner for a waking server or a lost connection; a header with display settings and an account menu; sidebar navigation on wide screens and a bottom bar on phones; announced page changes (title and focus); error pages with recovery and support references, a not-found page, and a last-resort error screen; a sign-in page; settings with display preferences and signed-in devices (sign out one or all).
 - End-to-end tests in a real browser (`npm run test:e2e`) for user journeys, keyboard access, accessibility scans including color contrast in every theme and in Urdu, layouts at 320 px, and a Lighthouse accessibility score of 100; run in continuous integration.
 - Web app (`apps/web`) with the design system: semantic color, type, spacing, radius, elevation and motion tokens; light, dark and high-contrast themes verified against WCAG 2.2 (AA, and AAA in high contrast) by automated contrast tests; text size from 87.5% to 150%, comfortable and compact spacing, reduced motion, and English and right-to-left Urdu, all applied instantly, remembered, and following system settings; accessible components (button, icon button, form fields with linked hints and errors, password visibility, character count, error summary, date and time field in the class time zone, checkbox, switch, radio group, segmented control, slider, dialog, sheet, menu, tabs, tooltip, toast, alert, badge, course tag, avatar, card, empty state, skeleton, spinner, skip link); a living style guide; automated accessibility scans in every theme and language.
@@ -29,6 +31,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- The error summary takes focus once per submit attempt instead of whenever its contents change, so correcting a field never moves focus away from it.
+- The greeting keeps a title with the first name ("Dr. Ayesha" rather than "Dr.").
 - Continuous integration caches the MongoDB binary used by the database tests.
 - Workspace packages build before the applications that depend on them, and type checks and tests read `@sabaq/shared` from its sources, so no build step is needed first.
 - Prettier, commitlint and lint-staged settings moved into `package.json` to keep the repository root tidy.

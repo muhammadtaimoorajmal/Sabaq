@@ -139,7 +139,7 @@ For the product itself, see the [vision](vision.md).
 - **Deliverables:** routing with protected routes; data fetching and caching; API client with silent token refresh and an honest "connecting" state; internationalization with right-to-left layout; responsive navigation (sidebar on desktop, bottom bar on mobile); skip link; error boundary with recovery; not-found page; layouts from 320 px upward.
 - **Done when:** everything is reachable by keyboard; Lighthouse accessibility score is 100.
 
-### M15 · Authentication screens
+### M15 · Authentication screens ✅
 
 - **Goal:** Sign up and sign in without friction or confusion.
 - **Depends on:** M07, M14.

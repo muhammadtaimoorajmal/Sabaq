@@ -94,6 +94,7 @@ function SignUpExample() {
   const { t } = useTranslation();
   const [values, setValues] = useState({ name: '', email: '', password: '' });
   const [errors, setErrors] = useState<FormError[]>([]);
+  const [attempt, setAttempt] = useState(0);
   const [saved, setSaved] = useState(false);
   const errorFor = (field: string) => errors.find((error) => error.field === field)?.message;
 
@@ -107,12 +108,13 @@ function SignUpExample() {
     if (values.password.length < 8)
       found.push({ field: 'ds-password', message: t('designSystem.sample.passwordShort') });
     setErrors(found);
+    setAttempt((current) => current + 1);
     setSaved(found.length === 0);
   };
 
   return (
     <form noValidate onSubmit={submit} className="flex max-w-md flex-col gap-5">
-      <ErrorSummary errors={errors} />
+      <ErrorSummary errors={errors} attempt={attempt} />
       {saved && <Alert tone="success" live="polite" title={t('designSystem.sample.formSaved')} />}
       <Field
         id="ds-name"

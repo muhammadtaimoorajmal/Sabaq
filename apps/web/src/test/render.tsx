@@ -2,7 +2,7 @@ import { DEFAULT_PREFERENCES, type Preferences, type PreferencesUpdate } from '@
 import { render, type RenderResult } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import axe from 'axe-core';
-import type { ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import { AppProviders } from '../app/AppProviders';
 import { createI18n } from '../i18n';
 import { mergePreferences } from '../preferences/preferences';
@@ -14,11 +14,15 @@ export function renderWithProviders(
 ): RenderResult & { user: ReturnType<typeof userEvent.setup>; preferences: Preferences } {
   const merged = mergePreferences(DEFAULT_PREFERENCES, preferences);
   const user = userEvent.setup();
-  const result = render(
-    <AppProviders i18n={createI18n(merged.language)} preferences={merged}>
-      {ui}
-    </AppProviders>,
-  );
+  const i18n = createI18n(merged.language);
+  // A wrapper (not a parent element) keeps the providers in place when tests rerender.
+  const result = render(ui, {
+    wrapper: ({ children }: { children: ReactNode }) => (
+      <AppProviders i18n={i18n} preferences={merged}>
+        {children}
+      </AppProviders>
+    ),
+  });
   return { ...result, user, preferences: merged };
 }
 

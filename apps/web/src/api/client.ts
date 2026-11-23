@@ -16,6 +16,8 @@ export class ApiRequestError extends Error {
     message: string,
     readonly issues: FieldIssue[] = [],
     readonly requestId: string | null = null,
+    /** From the Retry-After header, for example while an account is locked. */
+    readonly retryAfterSeconds: number | null = null,
   ) {
     super(message);
     this.name = 'ApiRequestError';
@@ -100,7 +102,15 @@ async function toError(response: Response): Promise<ApiRequestError> {
     );
   }
   const { code, message, issues, requestId } = parsed.data.error;
-  return new ApiRequestError(response.status, code, message, issues, requestId);
+  const retryAfter = Number(response.headers.get('retry-after'));
+  return new ApiRequestError(
+    response.status,
+    code,
+    message,
+    issues,
+    requestId,
+    Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter : null,
+  );
 }
 
 /** Exchanges the refresh cookie for a new session; `null` when there is no valid session. */

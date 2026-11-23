@@ -11,7 +11,19 @@ export interface MailMessage {
 
 export interface Mailer {
   send: (message: MailMessage) => Promise<void>;
+  /**
+   * Development only: the latest messages that would have been sent, so e-mail links can be
+   * opened without a mail account. Present only when no SMTP server is configured.
+   */
+  outbox?: OutboxMessage[];
 }
+
+export interface OutboxMessage extends Omit<MailMessage, 'html'> {
+  sentAt: string;
+}
+
+/** The development outbox keeps this many messages, newest first. */
+export const OUTBOX_SIZE = 50;
 
 type TransportFactory = (options: {
   host: string;
@@ -31,8 +43,12 @@ export function createMailer(
 ): Mailer {
   const { from, smtp } = config.mail;
   if (!smtp) {
+    const outbox: OutboxMessage[] = [];
     return {
+      outbox,
       send: async ({ to, subject, text }) => {
+        outbox.unshift({ to, subject, text, sentAt: new Date().toISOString() });
+        outbox.splice(OUTBOX_SIZE);
         logger.info({ mail: { to, subject, text } }, 'E-mail written to the log (no SMTP server)');
       },
     };

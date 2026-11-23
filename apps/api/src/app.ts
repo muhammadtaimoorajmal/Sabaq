@@ -12,6 +12,7 @@ import { errorHandler, notFound } from './middleware/errors.js';
 import { httpLogger, isHealthRequest } from './middleware/http-logger.js';
 import { REQUEST_ID_HEADER } from './middleware/request-id.js';
 import type { Mailer } from './mail/mailer.js';
+import { devRouter } from './routes/dev.js';
 import { healthRouter, type HealthCheck } from './routes/health.js';
 
 export interface AppDependencies {
@@ -86,6 +87,9 @@ export function createApp({
   app.use('/api', healthRouter({ version: config.version, checks: healthChecks }));
   const auth = new AuthService({ config, mailer, logger, now });
   app.use('/api/auth', authRouter({ service: auth, config, now }));
+  if (!config.isProduction && mailer.outbox) {
+    app.use('/api', devRouter({ outbox: mailer.outbox }));
+  }
 
   app.use(notFound);
   app.use(errorHandler);

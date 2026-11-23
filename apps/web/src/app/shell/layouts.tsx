@@ -5,6 +5,7 @@ import { useConnection } from '../../api/connection';
 import { useAuth } from '../../auth/AuthProvider';
 import { Card, Spinner } from '../../components/ui';
 import { useMediaQuery, WIDE_SCREEN } from '../../lib/useMediaQuery';
+import { VerifyEmailBanner } from '../../pages/auth/VerifyEmailPage';
 import { AccountMenu, DisplaySettingsButton, Logo, PrimaryNavigation } from './ShellParts';
 
 /** Shown while the session is being restored: honest about a slow server. */
@@ -73,6 +74,7 @@ export function AppLayout() {
           className="min-w-0 flex-1 px-4 py-6 pb-24 focus:outline-none sm:px-6 lg:px-10 lg:pb-10"
         >
           <div className="mx-auto max-w-4xl">
+            <VerifyEmailBanner />
             <Outlet />
           </div>
         </main>

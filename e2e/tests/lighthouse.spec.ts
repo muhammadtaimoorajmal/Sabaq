@@ -17,7 +17,7 @@ async function sessionCookie(): Promise<string> {
 }
 
 test.describe('Lighthouse', () => {
-  test.setTimeout(240_000);
+  test.setTimeout(600_000);
 
   test('scores 100 for accessibility on every page', async () => {
     test.skip(test.info().project.name !== 'desktop', 'Runs once, on desktop');
@@ -29,6 +29,8 @@ test.describe('Lighthouse', () => {
       const cookie = await sessionCookie();
       for (const [path, signedIn] of [
         ['/sign-in', false],
+        ['/sign-up', false],
+        ['/forgot-password', false],
         ['/', true],
         ['/settings', true],
         ['/design-system', false],

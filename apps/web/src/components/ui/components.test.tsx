@@ -177,6 +177,37 @@ describe('ErrorSummary', () => {
     expect(screen.getByLabelText('E-mail')).toHaveFocus();
   });
 
+  it('takes focus once per submit attempt, never while a field is being corrected', () => {
+    const errors = (message: string) => [{ field: 'pw', message }];
+    const { rerender } = renderWithProviders(
+      <>
+        <ErrorSummary errors={errors('Use at least 8 characters.')} attempt={1} />
+        <input id="pw" aria-label="Password" />
+      </>,
+    );
+    expect(screen.getByRole('alert')).toHaveFocus();
+    const input = screen.getByLabelText('Password');
+    input.focus();
+
+    // The message changes while the person types: focus must stay in the field.
+    rerender(
+      <>
+        <ErrorSummary errors={errors('Choose a different password.')} attempt={1} />
+        <input id="pw" aria-label="Password" />
+      </>,
+    );
+    expect(input).toHaveFocus();
+
+    // A new submit attempt with problems moves focus to the summary again.
+    rerender(
+      <>
+        <ErrorSummary errors={errors('Choose a different password.')} attempt={2} />
+        <input id="pw" aria-label="Password" />
+      </>,
+    );
+    expect(screen.getByRole('alert')).toHaveFocus();
+  });
+
   it('renders nothing without errors, and ignores links to missing fields', async () => {
     const { rerender, user } = renderWithProviders(<ErrorSummary errors={[]} />);
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();

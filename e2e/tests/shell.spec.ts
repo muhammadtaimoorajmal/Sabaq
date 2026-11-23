@@ -18,7 +18,7 @@ test.describe('signing in', () => {
     await page.locator('#sign-in-email').fill(DEMO.email);
     await page.locator('#sign-in-password').fill('not the password');
     await page.getByRole('button', { name: 'Sign in', exact: true }).click();
-    await expect(page.getByRole('alert')).toHaveText(
+    await expect(page.getByRole('alert')).toContainText(
       'The e-mail address or password is incorrect.',
     );
   });
@@ -40,6 +40,7 @@ test.describe('keyboard', () => {
   test('reaches the skip link first and every control by Tab alone', async ({ page }) => {
     await signIn(page);
     await page.goto('/');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(DEMO.firstName);
     await page.keyboard.press('Tab');
     await expect(page.getByRole('link', { name: 'Skip to main content' })).toBeFocused();
     await page.keyboard.press('Enter');
@@ -66,6 +67,10 @@ test.describe('keyboard', () => {
 
 const PAGES = [
   { path: '/sign-in', signedIn: false },
+  { path: '/sign-up', signedIn: false },
+  { path: '/forgot-password', signedIn: false },
+  { path: '/reset-password', signedIn: false },
+  { path: '/verify-email', signedIn: false },
   { path: '/', signedIn: true },
   { path: '/settings', signedIn: true },
   { path: '/design-system', signedIn: false },

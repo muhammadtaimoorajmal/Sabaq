@@ -9,18 +9,29 @@ export interface FormError {
 }
 
 /**
- * Lists every problem at the top of a form after a failed submit. It receives focus, so
- * keyboard and screen-reader users learn about all problems at once, and each entry moves
- * focus to the field that needs fixing.
+ * Lists every problem at the top of a form after a failed submit. It receives focus once per
+ * submit attempt, so keyboard and screen-reader users learn about all problems at once, and
+ * each entry moves focus to the field that needs fixing. It never takes focus while someone is
+ * correcting a field, even though its list updates as they type.
  */
-export function ErrorSummary({ errors, title }: { errors: FormError[]; title?: string }) {
+export function ErrorSummary({
+  errors,
+  title,
+  attempt = 0,
+}: {
+  errors: FormError[];
+  title?: string;
+  /** Increases with every submit attempt; each new attempt with problems moves focus here. */
+  attempt?: number;
+}) {
   const { t } = useTranslation();
   const ref = useRef<HTMLDivElement>(null);
-  const signature = errors.map((error) => `${error.field}:${error.message}`).join('|');
+  const visible = errors.length > 0;
 
   useEffect(() => {
-    if (signature) ref.current?.focus();
-  }, [signature]);
+    if (visible) ref.current?.focus();
+    // Only a new attempt (or the summary appearing) moves focus, not edits to its contents.
+  }, [attempt, visible]);
 
   if (errors.length === 0) return null;
   return (

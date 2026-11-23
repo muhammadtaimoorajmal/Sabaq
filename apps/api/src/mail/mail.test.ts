@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { memoryLogger } from '../test/helpers.js';
-import { createMailer } from './mailer.js';
+import { createMailer, OUTBOX_SIZE } from './mailer.js';
 import { renderEmail } from './templates.js';
 
 const message = { to: 'zara@example.com', subject: 'Hello', text: 'Plain', html: '<p>Rich</p>' };
@@ -89,5 +89,27 @@ describe('renderEmail', () => {
     });
     expect(email.html).not.toContain('<script>');
     expect(email.html).toContain('&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt; &amp; Co');
+  });
+});
+
+describe('development outbox', () => {
+  it('keeps the newest messages first, up to a limit, only without SMTP', async () => {
+    const mailer = createMailer({ mail: { from: 'a@b.c', smtp: null } }, memoryLogger().logger);
+    for (let index = 0; index < OUTBOX_SIZE + 5; index += 1) {
+      await mailer.send({ ...message, subject: `Message ${index}` });
+    }
+    expect(mailer.outbox).toHaveLength(OUTBOX_SIZE);
+    expect(mailer.outbox?.[0]).toMatchObject({
+      to: 'zara@example.com',
+      subject: `Message ${OUTBOX_SIZE + 4}`,
+    });
+    expect(mailer.outbox?.[0]).not.toHaveProperty('html');
+
+    const smtp = createMailer(
+      { mail: { from: 'a@b.c', smtp: { host: 'h', port: 587, user: null, pass: null } } },
+      memoryLogger().logger,
+      (() => ({ sendMail: vi.fn() })) as never,
+    );
+    expect(smtp.outbox).toBeUndefined();
   });
 });

@@ -25,6 +25,8 @@ interface AuthValue {
   signOut: () => Promise<void>;
   /** Forgets the session locally after it was ended elsewhere (for example "all devices"). */
   endLocally: () => void;
+  /** Replaces the signed-in user after a change, such as a confirmed e-mail address. */
+  updateUser: (user: User) => void;
 }
 
 const AuthContext = createContext<AuthValue | null>(null);
@@ -71,9 +73,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     endLocally();
   }, [endLocally]);
 
+  const updateUser = useCallback((user: User) => {
+    setState((current) =>
+      current.status === 'authenticated' ? { status: 'authenticated', user } : current,
+    );
+  }, []);
+
   const value = useMemo(
-    () => ({ state, signIn, signOut, endLocally }),
-    [state, signIn, signOut, endLocally],
+    () => ({ state, signIn, signOut, endLocally, updateUser }),
+    [state, signIn, signOut, endLocally, updateUser],
   );
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

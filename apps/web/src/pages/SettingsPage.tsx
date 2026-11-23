@@ -18,6 +18,7 @@ import {
 } from '../components/ui';
 import { errorKey } from '../i18n';
 import { PreferencesPanel } from '../preferences/PreferencesPanel';
+import { ChangePasswordCard } from './ChangePasswordCard';
 
 /** "3 minutes ago", "yesterday" … in the interface language. */
 export function relativeTime(iso: string, language: string, now = Date.now()): string {
@@ -158,6 +159,7 @@ export function SettingsPage() {
         </div>
         <PreferencesPanel />
       </Card>
+      <ChangePasswordCard />
       <Devices />
     </div>
   );

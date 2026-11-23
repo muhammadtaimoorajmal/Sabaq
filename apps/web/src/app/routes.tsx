@@ -20,7 +20,38 @@ export const routes: RouteObject[] = [
           {
             path: 'sign-in',
             handle: handle('signIn.title'),
-            lazy: () => import('../pages/SignInPage').then((m) => ({ Component: m.SignInPage })),
+            lazy: () =>
+              import('../pages/auth/SignInPage').then((m) => ({ Component: m.SignInPage })),
+          },
+          {
+            path: 'sign-up',
+            handle: handle('auth.signUp.title'),
+            lazy: () =>
+              import('../pages/auth/SignUpPage').then((m) => ({ Component: m.SignUpPage })),
+          },
+          {
+            path: 'forgot-password',
+            handle: handle('auth.forgot.title'),
+            lazy: () =>
+              import('../pages/auth/PasswordRecovery').then((m) => ({
+                Component: m.ForgotPasswordPage,
+              })),
+          },
+          {
+            path: 'reset-password',
+            handle: handle('auth.reset.title'),
+            lazy: () =>
+              import('../pages/auth/PasswordRecovery').then((m) => ({
+                Component: m.ResetPasswordPage,
+              })),
+          },
+          {
+            path: 'verify-email',
+            handle: handle('auth.verify.bannerTitle'),
+            lazy: () =>
+              import('../pages/auth/VerifyEmailPage').then((m) => ({
+                Component: m.VerifyEmailPage,
+              })),
           },
         ],
       },

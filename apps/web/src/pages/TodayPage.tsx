@@ -12,12 +12,20 @@ export function partOfDay(now: Date, timeZone: string): 'morning' | 'afternoon' 
   return hour < 17 ? 'afternoon' : 'evening';
 }
 
+const TITLES = /^(dr|prof|mr|mrs|ms|miss|engr|sir|madam)\.?$/i;
+
+/** How to greet someone: the first name, keeping a title such as "Dr." in front of it. */
+export function greetingName(fullName: string): string {
+  const words = fullName.trim().split(/\s+/).filter(Boolean);
+  const [first = fullName, second] = words;
+  return TITLES.test(first) && second ? `${first} ${second}` : first;
+}
+
 /** The home page. Deadlines and announcements fill it once classes exist. */
 export function TodayPage({ now = new Date() }: { now?: Date }) {
   const { t, i18n } = useTranslation();
   const user = useCurrentUser();
   const { timeZone } = user.preferences;
-  const firstName = user.name.split(/\s+/)[0] ?? user.name;
   const date = new Intl.DateTimeFormat(i18n.language, { dateStyle: 'full', timeZone }).format(now);
 
   return (
@@ -25,7 +33,7 @@ export function TodayPage({ now = new Date() }: { now?: Date }) {
       <header className="flex flex-col gap-1">
         <p className="font-semibold text-muted">{date}</p>
         <h1 className="text-display font-bold tracking-tight text-text">
-          {t(`today.${partOfDay(now, timeZone)}`, { name: firstName })}
+          {t(`today.${partOfDay(now, timeZone)}`, { name: greetingName(user.name) })}
         </h1>
       </header>
       <EmptyState

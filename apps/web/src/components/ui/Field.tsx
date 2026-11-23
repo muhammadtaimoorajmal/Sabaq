@@ -1,8 +1,9 @@
-import { AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { AlertCircle, ArrowBigUpDash, Eye, EyeOff } from 'lucide-react';
 import {
   createContext,
   forwardRef,
   type InputHTMLAttributes,
+  type KeyboardEvent,
   type ReactNode,
   type SelectHTMLAttributes,
   type TextareaHTMLAttributes,
@@ -120,36 +121,72 @@ export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputE
 
 /** A password input with a button that shows or hides what was typed. */
 export const PasswordInput = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(
-  function PasswordInput({ className, ...props }, ref) {
+  function PasswordInput({ className, onKeyDown, onKeyUp, onBlur, ...props }, ref) {
     const { t } = useTranslation();
     const [visible, setVisible] = useState(false);
+    const [capsLock, setCapsLock] = useState(false);
     const fieldProps = useFieldProps(props);
+    const capsId = `${fieldProps.id ?? 'password'}-caps`;
+    // Caps Lock is the most common reason a correct password is rejected.
+    const readCapsLock = (event: KeyboardEvent<HTMLInputElement>) =>
+      setCapsLock(event.getModifierState?.('CapsLock') ?? false);
     return (
-      <div className="relative">
-        <input
-          ref={ref}
-          type={visible ? 'text' : 'password'}
-          autoCapitalize="none"
-          autoCorrect="off"
-          spellCheck={false}
-          className={cn(controlClasses, 'h-control pe-12', className)}
-          {...props}
-          {...fieldProps}
-        />
-        <button
-          type="button"
-          onClick={() => setVisible((current) => !current)}
-          aria-pressed={visible}
-          aria-controls={fieldProps.id}
-          aria-label={visible ? t('form.hidePassword') : t('form.showPassword')}
-          className="absolute inset-y-1 inset-e-1 inline-flex w-10 items-center justify-center rounded-sm text-muted hover:bg-surface-sunken hover:text-text"
+      <div className="flex flex-col gap-1.5">
+        <div className="relative">
+          <input
+            ref={ref}
+            type={visible ? 'text' : 'password'}
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            className={cn(controlClasses, 'h-control pe-12', className)}
+            onKeyDown={(event) => {
+              readCapsLock(event);
+              onKeyDown?.(event);
+            }}
+            onKeyUp={(event) => {
+              readCapsLock(event);
+              onKeyUp?.(event);
+            }}
+            onBlur={(event) => {
+              setCapsLock(false);
+              onBlur?.(event);
+            }}
+            {...props}
+            {...fieldProps}
+            aria-describedby={
+              [fieldProps['aria-describedby'], capsLock ? capsId : undefined]
+                .filter(Boolean)
+                .join(' ') || undefined
+            }
+          />
+          <button
+            type="button"
+            onClick={() => setVisible((current) => !current)}
+            aria-pressed={visible}
+            aria-controls={fieldProps.id}
+            aria-label={visible ? t('form.hidePassword') : t('form.showPassword')}
+            className="absolute inset-y-1 inset-e-1 inline-flex w-10 items-center justify-center rounded-sm text-muted hover:bg-surface-sunken hover:text-text"
+          >
+            {visible ? (
+              <EyeOff aria-hidden="true" className="size-5" />
+            ) : (
+              <Eye aria-hidden="true" className="size-5" />
+            )}
+          </button>
+        </div>
+        <p
+          id={capsId}
+          aria-live="polite"
+          className="text-sm font-semibold text-warning-text empty:hidden"
         >
-          {visible ? (
-            <EyeOff aria-hidden="true" className="size-5" />
-          ) : (
-            <Eye aria-hidden="true" className="size-5" />
+          {capsLock && (
+            <span className="inline-flex items-center gap-1.5">
+              <ArrowBigUpDash aria-hidden="true" className="size-4" />
+              {t('auth.capsLock')}
+            </span>
           )}
-        </button>
+        </p>
       </div>
     );
   },

@@ -2,8 +2,8 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { relativeTime } from '../pages/SettingsPage';
-import { safeNext } from '../pages/SignInPage';
-import { partOfDay } from '../pages/TodayPage';
+import { safeNext } from '../pages/auth/SignInPage';
+import { greetingName, partOfDay } from '../pages/TodayPage';
 import { AppErrorBoundary } from './App';
 
 describe('safeNext', () => {
@@ -25,6 +25,18 @@ describe('partOfDay', () => {
     expect(partOfDay(instant, 'Asia/Tokyo')).toBe('afternoon');
     expect(partOfDay(instant, 'America/New_York')).toBe('morning');
     expect(partOfDay(new Date('2026-11-22T14:00:00Z'), 'Asia/Karachi')).toBe('evening');
+  });
+});
+
+describe('greetingName', () => {
+  it.each([
+    ['Zara Ahmed', 'Zara'],
+    ['Dr. Ayesha Siddiqui', 'Dr. Ayesha'],
+    ['Prof Imran Qureshi', 'Prof Imran'],
+    ['Madonna', 'Madonna'],
+    ['Dr.', 'Dr.'],
+  ])('%s → %s', (name, expected) => {
+    expect(greetingName(name)).toBe(expected);
   });
 });
 

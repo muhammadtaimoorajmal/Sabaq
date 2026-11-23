@@ -56,6 +56,8 @@ export default defineConfig({
       // Always start fresh servers with test settings; never reuse a developer's running one.
       reuseExistingServer: false,
       timeout: 180_000,
+      // One-tap demo accounts on the sign-in page, as on a public demo installation.
+      env: { VITE_DEMO_ACCOUNTS: 'true' },
     },
   ],
 });
