@@ -161,7 +161,7 @@ For the product itself, see the [vision](vision.md).
 - Instructors and class reps create a class (program, section, term) and its courses (code, title, schedule, venue, color); join code, link and QR code; join, leave, roles and member management; permission checks on every endpoint.
 - **Done when:** a student joins a class in under 30 seconds; unauthorized actions are refused with clear messages.
 
-### M18 · Onboarding, profile and personalization
+### M18 · Onboarding, profile and personalization ✅
 
 - First-run onboarding with progress and a skip option; profile; settings for theme, text size, density, language, reduced motion, notifications and quiet hours, applied instantly and synced across devices; data export and account deletion.
 - **Done when:** a new user is set up in under two minutes.

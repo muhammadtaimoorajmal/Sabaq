@@ -4,6 +4,8 @@ import express, { type Express, type RequestHandler } from 'express';
 import { rateLimit } from 'express-rate-limit';
 import helmet from 'helmet';
 import type { Logger } from 'pino';
+import { accountRouter, usersRouter } from './account/routes.js';
+import { AccountService } from './account/service.js';
 import { requireAuth } from './auth/middleware.js';
 import { authRouter } from './auth/routes.js';
 import { AuthService } from './auth/service.js';
@@ -92,6 +94,9 @@ export function createApp({
   app.use('/api/auth', authRouter({ service: auth, config, now }));
   const authenticated = requireAuth({ service: auth, secret: config.auth.jwtSecret, now });
   app.use('/api/classes', classesRouter({ service: new ClassService(), authenticated }));
+  const account = new AccountService({ logger, now });
+  app.use('/api/account', accountRouter({ service: account, authenticated, config }));
+  app.use('/api/users', usersRouter({ service: account }));
   if (!config.isProduction && mailer.outbox) {
     app.use('/api', devRouter({ outbox: mailer.outbox }));
   }

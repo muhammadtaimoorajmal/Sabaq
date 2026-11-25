@@ -1,10 +1,11 @@
 import type { SessionInfo } from '@sabaq/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Laptop, LogOut } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { api, ApiRequestError } from '../api/client';
-import { useAuth } from '../auth/AuthProvider';
+import { useAuth, useCurrentUser } from '../auth/AuthProvider';
 import {
   Alert,
   Badge,
@@ -18,6 +19,11 @@ import {
 } from '../components/ui';
 import { errorKey } from '../i18n';
 import { PreferencesPanel } from '../preferences/PreferencesPanel';
+import { AccountDataCard } from './account/AccountDataCard';
+import { AvatarPicker } from './account/AvatarPicker';
+import { NotificationSettings } from './account/NotificationSettings';
+import { ProfileForm } from './account/ProfileForm';
+import { RegionalSettings } from './account/RegionalSettings';
 import { ChangePasswordCard } from './ChangePasswordCard';
 
 /** "3 minutes ago", "yesterday" … in the interface language. */
@@ -147,20 +153,118 @@ function Devices() {
   );
 }
 
+const SECTIONS = ['profile', 'display', 'regional', 'notifications', 'security', 'data'] as const;
+type Section = (typeof SECTIONS)[number];
+
+/** A settings card with its heading, which the "On this page" links point to. */
+function SettingsSection({
+  id,
+  children,
+  intro = true,
+}: {
+  id: Section;
+  children: ReactNode;
+  intro?: boolean;
+}) {
+  const { t } = useTranslation();
+  return (
+    <Card
+      role="region"
+      aria-labelledby={`settings-${id}`}
+      className="flex scroll-mt-24 flex-col gap-5"
+      id={`section-${id}`}
+    >
+      <div>
+        <h2 id={`settings-${id}`} className="text-xl font-bold text-text">
+          {t(`account.sections.${id}`)}
+        </h2>
+        {intro && <p className="text-muted">{t(`account.intros.${id}`)}</p>}
+      </div>
+      {children}
+    </Card>
+  );
+}
+
+function ProfileSection() {
+  const { t } = useTranslation();
+  const user = useCurrentUser();
+  return (
+    <SettingsSection id="profile">
+      <AvatarPicker />
+      <div className="flex flex-col gap-1">
+        <span className="font-semibold text-text">{t('auth.fields.email')}</span>
+        <p className="flex flex-wrap items-center gap-2 text-text" dir="ltr">
+          <span className="min-w-0 [overflow-wrap:anywhere]">{user.email}</span>
+          <Badge tone={user.emailVerified ? 'success' : 'warning'}>
+            {user.emailVerified ? t('account.profile.verified') : t('account.profile.unverified')}
+          </Badge>
+        </p>
+      </div>
+      <ProfileForm
+        id="profile"
+        submitLabel={t('account.profile.save')}
+        onSaved={() => toast.success(t('account.profile.saved'))}
+      />
+    </SettingsSection>
+  );
+}
+
+/**
+ * Everything about the person's account on one page, in the order people look for it, with
+ * links to each part. Display, time and notification settings apply as soon as they change and
+ * are saved to the account, so they follow the person to every device.
+ */
 export function SettingsPage() {
   const { t } = useTranslation();
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-display font-bold tracking-tight text-text">{t('settings.title')}</h1>
-      <Card className="flex flex-col gap-4">
-        <div>
-          <h2 className="text-xl font-bold text-text">{t('settings.display')}</h2>
-          <p className="text-muted">{t('settings.displayBody')}</p>
+      <div className="flex flex-col gap-1">
+        <h1 className="text-display font-bold tracking-tight text-text">{t('settings.title')}</h1>
+        <p className="text-muted">{t('account.syncNote')}</p>
+      </div>
+      <div className="grid items-start gap-6 lg:grid-cols-[12rem_1fr]">
+        <nav aria-label={t('account.onThisPage')} className="lg:sticky lg:top-20">
+          <h2 className="mb-2 text-sm font-semibold text-muted">{t('account.onThisPage')}</h2>
+          <ul className="flex flex-wrap gap-2 lg:flex-col lg:gap-1">
+            {SECTIONS.map((section) => (
+              <li key={section}>
+                <a
+                  href={`#section-${section}`}
+                  className="inline-flex min-h-11 items-center rounded-md px-3 font-medium text-text underline-offset-4 hover:bg-surface-sunken hover:underline lg:w-full"
+                >
+                  {t(`account.sections.${section}`)}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <div className="flex min-w-0 flex-col gap-6">
+          <ProfileSection />
+          <SettingsSection id="display">
+            <PreferencesPanel />
+          </SettingsSection>
+          <SettingsSection id="regional">
+            <RegionalSettings />
+          </SettingsSection>
+          <SettingsSection id="notifications">
+            <NotificationSettings />
+          </SettingsSection>
+          <section
+            id="section-security"
+            aria-labelledby="settings-security"
+            className="flex scroll-mt-24 flex-col gap-6"
+          >
+            <h2 id="settings-security" className="sr-only">
+              {t('account.sections.security')}
+            </h2>
+            <ChangePasswordCard />
+            <Devices />
+          </section>
+          <div id="section-data" className="scroll-mt-24">
+            <AccountDataCard />
+          </div>
         </div>
-        <PreferencesPanel />
-      </Card>
-      <ChangePasswordCard />
-      <Devices />
+      </div>
     </div>
   );
 }

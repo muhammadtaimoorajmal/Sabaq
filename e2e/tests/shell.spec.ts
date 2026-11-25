@@ -1,5 +1,12 @@
 import { expect, test } from '@playwright/test';
-import { DEMO, expectNoViolations, scrollsSideways, signIn, usePreferences } from './helpers';
+import {
+  DEMO,
+  expectNoViolations,
+  scrollsSideways,
+  signIn,
+  signUp,
+  usePreferences,
+} from './helpers';
 
 test.describe('signing in', () => {
   test('takes the demo student to Today, and back to the page they wanted', async ({ page }) => {
@@ -89,8 +96,8 @@ test.describe('accessibility in a real browser, including color contrast', () =>
     for (const { path, signedIn } of PAGES) {
       test(`${path} (${display.name})`, async ({ page }) => {
         await usePreferences(page, display.preferences);
-        if (signedIn) await signIn(page, path);
-        await page.goto(path);
+        if (signedIn) await signUp(page, display.preferences, path);
+        else await page.goto(path);
         await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
         await expectNoViolations(page);
       });
@@ -111,8 +118,13 @@ test.describe('small screens', () => {
   }
 
   test('fits 320 px with text at 150%', async ({ page }) => {
-    await usePreferences(page, { textScale: 1.5 });
-    await signIn(page);
+    await signUp(page, { textScale: 1.5 }, '/settings');
+    // The account's text size is applied once the session is restored.
+    await expect
+      .poll(() =>
+        page.evaluate(() => document.documentElement.style.getPropertyValue('--text-scale')),
+      )
+      .toBe('1.5');
     expect(await scrollsSideways(page)).toBe(false);
   });
 });

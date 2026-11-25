@@ -25,7 +25,7 @@ erDiagram
 
 | Collection | Holds | Notes |
 | --- | --- | --- |
-| `users` | Accounts and personal preferences | E-mail stored lowercase; the password hash (Argon2id) is never returned unless explicitly requested |
+| `users` | Accounts, personal preferences, profile photo and the end of the welcome steps (`onboardedAt`) | E-mail stored lowercase; the password hash (Argon2id) and the photo bytes are never returned unless explicitly requested |
 | `classes` | A cohort, such as one section of a program in one term | Has its own time zone, in which "due today" is judged, and a unique join code |
 | `memberships` | A person's role in a class: student, class representative or instructor | Platform administrators are a separate role on the user |
 | `courses` | Subjects taught to a class, with weekly timetable | Course codes are unique within a class, ignoring letter case |

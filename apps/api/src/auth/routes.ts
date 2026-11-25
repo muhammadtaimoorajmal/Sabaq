@@ -20,7 +20,7 @@ import type { AuthService, IssuedSession } from './service.js';
 export const REFRESH_COOKIE = 'sabaq_refresh';
 
 /** The refresh cookie is unreadable by scripts, HTTPS-only in production and sent only to auth routes. */
-function cookieOptions(config: Pick<Config, 'isProduction'>): CookieOptions {
+export function refreshCookieOptions(config: Pick<Config, 'isProduction'>): CookieOptions {
   return { httpOnly: true, secure: config.isProduction, sameSite: 'strict', path: '/api/auth' };
 }
 
@@ -40,7 +40,7 @@ export function authRouter({
   const router = Router();
   const authenticated = requireAuth({ service, secret: config.auth.jwtSecret, now });
   const trustedOrigin = requireTrustedOrigin(new Set([...config.corsOrigins, config.appUrl]));
-  const cookie = cookieOptions(config);
+  const cookie = refreshCookieOptions(config);
 
   // Stricter limits where passwords are guessed or e-mails are triggered.
   const sensitive = rateLimit({

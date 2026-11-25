@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 import { useChangeRole, useMembers, useRemoveMember } from '../../api/classes';
-import { ApiRequestError } from '../../api/client';
+import { ApiRequestError, apiAsset } from '../../api/client';
 import { useCurrentUser } from '../../auth/AuthProvider';
 import {
   Alert,
@@ -79,7 +79,7 @@ export function MembersTab({ cls }: { cls: ClassForMember }) {
           );
           return (
             <li key={member.user.id} className="flex flex-wrap items-center gap-3 p-4">
-              <Avatar name={member.user.name} src={member.user.avatarUrl} decorative />
+              <Avatar name={member.user.name} src={apiAsset(member.user.avatarUrl)} decorative />
               <div className="min-w-0 flex-1">
                 <p className="flex flex-wrap items-center gap-2 font-semibold text-text">
                   {member.user.name}

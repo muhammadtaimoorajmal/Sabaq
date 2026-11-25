@@ -52,6 +52,17 @@ Open <http://localhost:5173> and sign in with the demo student `zara.ahmed@north
 | Choose a new password | `/reset-password#token=…` | Strength meter; clear next steps for expired or incomplete links |
 | Change password | Settings | Needs the current password; signs out other devices |
 
+## Onboarding and settings
+
+| Screen | Path | Highlights |
+| --- | --- | --- |
+| Welcome | `/welcome` | Three steps (about you, comfort, your class) with visible progress, Back, and "Skip setup" on every step; the step is in the address, so the browser's Back button works; focus moves to each step's heading. Shown after sign-up; Today offers to finish it until done or dismissed |
+| Settings | `/settings` | Profile with photo, display, date and time, notifications with quiet hours, password and devices, and your data (download a copy, delete the account), with "On this page" links |
+
+**Preferences follow the person.** Display, time and notification settings apply instantly, are remembered on the device, and are saved to the account a moment after each change (several quick changes are sent together). Signing in on another device brings them along; sign-up keeps the settings chosen before the account existed. If saving fails, the change still applies on this device and a single message explains it.
+
+**Photos are prepared on the device.** A chosen photo is cropped to a square, scaled to 256 pixels and compressed before upload, so even a large phone photo becomes a few kilobytes.
+
 **Validation at the right moment.** Problems appear after leaving a field you filled in, or on submit, never while typing a field for the first time and never for empty fields you merely tab through. They disappear the moment they are fixed. After a submit, an error summary lists every problem and takes focus once; it never steals focus while you correct a field.
 
 **Password managers.** Every field uses the right `autocomplete` value (`username`, `current-password`, `new-password`, `email`, `name`), and the change-password form tells managers which account it belongs to.

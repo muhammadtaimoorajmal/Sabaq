@@ -74,6 +74,24 @@ Every route needs a session. People outside a class get `404`, so class identifi
 
 A class always keeps at least one instructor or class representative: the last one cannot leave or step down (`last_manager`).
 
+### Your account (`/api/account`)
+
+Every route needs a session and acts on the signed-in person only.
+
+| Method and path | Purpose |
+| --- | --- |
+| `PATCH /profile` | Change the name or student ID (`null` clears it) |
+| `PATCH /preferences` | Change only the preferences sent (for example `{ "notifications": { "quietHours": { "start": "23:00" } } }`), so two devices editing different settings never overwrite each other |
+| `PUT /avatar` | Set the profile photo from a `data:` URL of a JPEG, PNG or WebP image of at most 64 KB; the file's first bytes must match its type |
+| `DELETE /avatar` | Remove the profile photo |
+| `POST /onboarding` | Record that the welcome steps were finished or skipped (the first time is kept) |
+| `GET /export` | Download everything stored about the person as `sabaq-data-<date>.json`, without password or token hashes |
+| `DELETE /` | Delete the account (`password` required). Refused with `last_manager`, listing the classes, while the person is the only manager of a class that has other members; classes with no other members are removed. Posts made in classes stay with the class |
+
+Profile photos are served at `GET /api/users/:id/avatar/:version`. The version changes with every upload, so addresses cannot be guessed and each photo is cached for a year (`Cache-Control: public, max-age=31536000, immutable`).
+
+Sign-up also accepts optional `preferences`, so display settings chosen before creating an account are kept.
+
 Sign-up, sign-in and refresh answer with `authResponseSchema` from `@sabaq/shared`. Routes that act on an e-mail address answer `202` whether or not an account exists, so they cannot be used to discover who has an account.
 
 ## Conventions
@@ -155,6 +173,7 @@ src/
 ├── app.ts            Builds the Express application (no side effects, used by tests)
 ├── server.ts         Listening and graceful shutdown
 ├── config/env.ts     Environment variables and their validation
+├── account/          Profile, photo, preferences, welcome steps, data export, account deletion
 ├── auth/             Sign-in, sessions, tokens, e-mail verification, passwords
 ├── classes/          Classes, memberships, roles and courses
 ├── db/               Connection, models, demo data

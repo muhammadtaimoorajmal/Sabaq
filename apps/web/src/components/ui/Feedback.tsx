@@ -56,7 +56,7 @@ export function Alert({
       <Icon aria-hidden="true" className={cn('mt-0.5 size-5 shrink-0', ALERT_TEXT[key])} />
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <p className={cn('font-semibold', ALERT_TEXT[key])}>{title}</p>
-        {children && <div className="text-text">{children}</div>}
+        {children && <div className="text-text [overflow-wrap:anywhere]">{children}</div>}
         {action && <div className="mt-2">{action}</div>}
       </div>
     </div>

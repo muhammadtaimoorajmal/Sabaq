@@ -14,6 +14,7 @@ export function serializeUser(user: HydratedDocument<UserRecord>): User {
     avatarUrl: user.avatarUrl,
     platformRole: user.platformRole,
     preferences,
+    onboardedAt: user.onboardedAt?.toISOString() ?? null,
     createdAt: user.createdAt.toISOString(),
   };
 }

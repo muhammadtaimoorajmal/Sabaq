@@ -11,6 +11,7 @@ export const TEST_USER: User = {
   avatarUrl: null,
   platformRole: 'user',
   preferences: { ...DEFAULT_PREFERENCES, timeZone: 'Asia/Karachi' },
+  onboardedAt: '2026-09-01T09:05:00.000Z',
   createdAt: '2026-09-01T09:00:00.000Z',
 };
 

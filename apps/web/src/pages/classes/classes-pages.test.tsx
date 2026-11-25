@@ -136,6 +136,7 @@ describe('joining', () => {
 });
 
 describe('creating a class', () => {
+  // A long journey with a lot of typing; slower when every test file runs at once.
   it('lists missing details, then creates the class and opens it', async () => {
     const { user, router, fetchMock } = start('/classes/new', {
       'POST /api/classes': () => json(201, cls({ role: 'instructor' })),
@@ -163,7 +164,7 @@ describe('creating a class', () => {
       timeZone: 'Asia/Karachi',
       myRole: 'instructor',
     });
-  });
+  }, 15_000);
 });
 
 describe('a class', () => {

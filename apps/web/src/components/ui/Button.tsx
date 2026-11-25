@@ -6,7 +6,8 @@ import { Spinner } from './Spinner';
 
 export const buttonVariants = cva(
   [
-    'inline-flex shrink-0 select-none items-center justify-center gap-2 whitespace-nowrap rounded-md font-semibold',
+    // Labels wrap instead of overflowing, so buttons still fit at 320 px with large text (WCAG 1.4.10).
+    'inline-flex max-w-full shrink-0 select-none items-center justify-center gap-2 rounded-md text-center font-semibold break-words',
     'transition-colors duration-150 ease-out',
     'disabled:cursor-not-allowed disabled:opacity-55 aria-disabled:cursor-not-allowed aria-disabled:opacity-55',
     '[&_svg]:size-[1.15em] [&_svg]:shrink-0',
@@ -21,9 +22,9 @@ export const buttonVariants = cva(
         danger: 'bg-danger text-danger-fg hover:brightness-95',
       },
       size: {
-        sm: 'h-9 px-3 text-sm',
-        md: 'h-control px-4 text-base',
-        lg: 'h-12 px-6 text-lg',
+        sm: 'min-h-9 px-3 py-1 text-sm',
+        md: 'min-h-control px-4 py-1.5 text-base',
+        lg: 'min-h-12 px-6 py-2 text-lg',
       },
       fullWidth: { true: 'w-full' },
     },

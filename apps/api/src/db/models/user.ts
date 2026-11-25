@@ -1,4 +1,5 @@
 import {
+  AVATAR_TYPES,
   DEFAULT_PREFERENCES,
   DENSITIES,
   DIGEST_FREQUENCIES,
@@ -30,14 +31,26 @@ export interface UserRecord extends Timestamps {
   passwordHash: string;
   studentId: string | null;
   avatarUrl: string | null;
+  /** The uploaded profile photo. Never selected unless explicitly requested. */
+  avatar: AvatarRecord | null;
   platformRole: PlatformRole;
   preferences: Preferences;
+  /** When the person finished or skipped the welcome steps. */
+  onboardedAt: Date | null;
   lastLoginAt: Date | null;
   /** Consecutive failed sign-ins; reset by a successful one. */
   failedLoginCount: number;
   /** Sign-in is refused until this time after too many failures. */
   lockedUntil: Date | null;
   passwordChangedAt: Date | null;
+}
+
+/** A small square photo, resized in the browser before upload. */
+export interface AvatarRecord {
+  data: Buffer;
+  contentType: (typeof AVATAR_TYPES)[number];
+  /** Changes with every upload and is part of the photo's address, so it can be cached forever. */
+  version: string;
 }
 
 const defaults = DEFAULT_PREFERENCES;
@@ -74,8 +87,21 @@ const userSchema = new Schema<UserRecord>(
     passwordHash: { type: String, required: true, select: false },
     studentId: nullableString(32),
     avatarUrl: nullableString(2048),
+    avatar: {
+      type: new Schema<AvatarRecord>(
+        {
+          data: { type: Buffer, required: true },
+          contentType: { type: String, enum: AVATAR_TYPES, required: true },
+          version: { type: String, required: true, maxlength: 64 },
+        },
+        { _id: false },
+      ),
+      default: null,
+      select: false,
+    },
     platformRole: { type: String, enum: PLATFORM_ROLES, default: 'user' },
     preferences: { type: preferencesSchema, default: () => ({}) },
+    onboardedAt: { type: Date, default: null },
     lastLoginAt: { type: Date, default: null },
     failedLoginCount: { type: Number, min: 0, default: 0 },
     lockedUntil: { type: Date, default: null },

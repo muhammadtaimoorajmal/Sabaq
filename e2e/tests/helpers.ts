@@ -35,6 +35,32 @@ export async function expectNoViolations(page: Page) {
   expect(summary).toEqual([]);
 }
 
+/** A unique address for an account created by a test. */
+export const newEmail = () =>
+  `student.${Date.now()}.${Math.random().toString(36).slice(2, 7)}@example.com`;
+
+export const NEW_PASSWORD = 'a quiet library afternoon';
+
+/**
+ * Creates a fresh account with these display preferences, signs this browser in and opens
+ * `next`. Signing in applies the account's preferences, so tests of a display (dark, Urdu …)
+ * need an account that has it, and must never change the shared demo accounts.
+ */
+export async function signUp(
+  page: Page,
+  preferences: Record<string, unknown> = {},
+  next = '/',
+): Promise<{ email: string }> {
+  const email = newEmail();
+  const response = await page.request.post('/api/auth/register', {
+    data: { name: 'Sara Javed', email, password: NEW_PASSWORD, preferences },
+  });
+  expect(response.status()).toBe(201);
+  await page.goto(next);
+  await expect(page.getByRole('heading', { level: 1 })).not.toHaveText(/^Sign in$|^سائن ان/);
+  return { email };
+}
+
 /** True when the page needs horizontal scrolling, which breaks reflow (WCAG 1.4.10). */
 export function scrollsSideways(page: Page) {
   return page.evaluate(

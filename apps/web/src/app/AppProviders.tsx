@@ -9,6 +9,7 @@ import { createQueryClient } from '../api/query-client';
 import { AuthProvider } from '../auth/AuthProvider';
 import { Toaster, TooltipProvider } from '../components/ui';
 import { PreferencesProvider, usePreferences } from '../preferences/PreferencesProvider';
+import { PreferencesSync } from '../preferences/PreferencesSync';
 
 /** Tells every component the reading direction, so arrow keys follow it in Urdu too. */
 function ReadingDirection({ children }: { children: ReactNode }) {
@@ -43,6 +44,7 @@ export function AppProviders({
           <QueryClientProvider client={client}>
             <ConnectionProvider>
               <AuthProvider>
+                <PreferencesSync />
                 <TooltipProvider>
                   {children}
                   <Toaster />

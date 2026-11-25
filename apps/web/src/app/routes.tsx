@@ -98,6 +98,14 @@ export const routes: RouteObject[] = [
               })),
           },
           {
+            path: 'welcome',
+            handle: handle('welcome.pageTitle'),
+            lazy: () =>
+              import('../pages/onboarding/WelcomePage').then((m) => ({
+                Component: m.WelcomePage,
+              })),
+          },
+          {
             path: 'settings',
             handle: handle('nav.settings'),
             lazy: () =>

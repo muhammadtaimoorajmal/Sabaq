@@ -93,7 +93,23 @@ describe('sign up', () => {
       name: 'Zara Ahmed',
       email: 'zara@example.com',
       password: 'correct horse battery',
+      // Display settings chosen on this device are kept with the new account.
+      preferences: expect.objectContaining({ theme: 'system', textScale: 1 }) as unknown,
     });
+  });
+
+  it('opens the welcome steps after signing up without a destination', async () => {
+    const { user } = start('/sign-up', {
+      'POST /api/auth/register': () => json(201, session({ ...unverified, onboardedAt: null })),
+    });
+    await user.type(await screen.findByLabelText(/Full name/), 'Zara Ahmed');
+    await user.type(screen.getByLabelText(/E-mail address/), 'zara@example.com');
+    await user.type(screen.getByLabelText(/^Password/), 'correct horse battery');
+    await user.click(screen.getByRole('button', { name: 'Create account' }));
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Welcome, Zara' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Step 1 of 3')).toBeInTheDocument();
   });
 
   it('offers to sign in when the address already has an account', async () => {

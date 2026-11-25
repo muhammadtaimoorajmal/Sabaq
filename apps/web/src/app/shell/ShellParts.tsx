@@ -1,6 +1,7 @@
 import { LogOut, Settings, SlidersHorizontal } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, NavLink, useNavigate } from 'react-router';
+import { apiAsset } from '../../api/client';
 import { useAuth, useCurrentUser } from '../../auth/AuthProvider';
 import {
   Avatar,
@@ -69,7 +70,7 @@ export function AccountMenu() {
         >
           {/* The name comes from this text, not an aria-label, so the visible initials never
               contradict it (WCAG 2.5.3, Label in Name). */}
-          <Avatar name={user.name} src={user.avatarUrl} size="sm" decorative />
+          <Avatar name={user.name} src={apiAsset(user.avatarUrl)} size="sm" decorative />
           <span className="sr-only">{t('shell.account', { name: user.name })}</span>
         </button>
       </MenuTrigger>
@@ -119,7 +120,7 @@ export function PrimaryNavigation() {
               'flex items-center rounded-md font-semibold text-muted transition-colors hover:text-text',
               wide
                 ? 'min-h-control gap-3 px-3'
-                : 'min-h-16 flex-1 flex-col justify-center gap-1 text-xs',
+                : 'min-h-16 min-w-0 flex-1 flex-col justify-center gap-1 px-1 text-center text-xs break-words',
               isActive && (wide ? 'bg-primary-soft text-primary-text' : 'text-primary-text'),
             )
           }

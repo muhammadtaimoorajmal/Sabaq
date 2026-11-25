@@ -1,10 +1,12 @@
-import type {
-  ChangePasswordInput,
-  LoginInput,
-  RegisterInput,
-  ResetPasswordInput,
-  SessionInfo,
-  User,
+import {
+  type ChangePasswordInput,
+  DEFAULT_PREFERENCES,
+  type LoginInput,
+  mergePreferences,
+  type RegisterInput,
+  type ResetPasswordInput,
+  type SessionInfo,
+  type User,
 } from '@sabaq/shared';
 import { isValidObjectId, type HydratedDocument, type Types } from 'mongoose';
 import type { Logger } from 'pino';
@@ -87,6 +89,7 @@ export class AuthService {
         name: input.name,
         email: input.email,
         studentId: input.studentId ?? null,
+        preferences: mergePreferences(DEFAULT_PREFERENCES, input.preferences ?? {}),
         passwordHash: await hashPassword(input.password),
       });
     } catch (error) {

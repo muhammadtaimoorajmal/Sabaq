@@ -93,6 +93,7 @@ export async function seedDemoData({
       studentId: person.studentId,
       platformRole,
       preferences: { timeZone },
+      onboardedAt: joined,
       ...stamp(joined),
     };
   };

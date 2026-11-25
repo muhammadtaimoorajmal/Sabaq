@@ -146,3 +146,12 @@ export async function api<T>(path: string, options: RequestOptions = {}): Promis
   const text = await response.text();
   return (text ? JSON.parse(text) : undefined) as T;
 }
+
+/**
+ * The address of a file served by the API, such as a profile photo. Paths from the API start
+ * with `/api/`; they are rewritten when the API lives on another origin.
+ */
+export function apiAsset(path: string | null | undefined): string | null {
+  if (!path) return null;
+  return path.startsWith('/api/') ? `${API_BASE}${path.slice(4)}` : path;
+}

@@ -1,11 +1,8 @@
 import { expect, test } from '@playwright/test';
-import { expectNoViolations, signIn } from './helpers';
+import { expectNoViolations, newEmail, signIn } from './helpers';
 
 /** The demo class's join code (see the API's demo data). */
 const DEMO_CODE = 'NRTH-5A26';
-
-const newEmail = () =>
-  `student.${Date.now()}.${Math.random().toString(36).slice(2, 7)}@example.com`;
 
 test('a new student joins a class from a shared link in under 30 seconds', async ({ page }) => {
   await page.goto('/sign-up');

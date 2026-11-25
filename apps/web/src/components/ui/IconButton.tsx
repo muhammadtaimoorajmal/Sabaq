@@ -34,7 +34,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(functio
       aria-label={label}
       className={cn(
         buttonVariants({ variant }),
-        size === 'sm' ? 'size-9 px-0' : 'size-control px-0',
+        size === 'sm' ? 'size-9 p-0' : 'size-control p-0',
         'text-muted hover:text-text',
         className,
       )}

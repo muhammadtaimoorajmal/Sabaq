@@ -1,7 +1,7 @@
 import {
   DEFAULT_PREFERENCES,
+  mergePreferences,
   type Preferences,
-  type PreferencesUpdate,
   preferencesUpdateSchema,
   RTL_LANGUAGES,
 } from '@sabaq/shared';
@@ -57,19 +57,7 @@ export function applyPreferences(
   root.dir = RTL_LANGUAGES.includes(preferences.language) ? 'rtl' : 'ltr';
 }
 
-/** Applies a partial update, including nested notification settings. */
-export function mergePreferences(base: Preferences, update: PreferencesUpdate): Preferences {
-  const { notifications, ...rest } = update;
-  return {
-    ...base,
-    ...rest,
-    notifications: {
-      ...base.notifications,
-      ...notifications,
-      quietHours: { ...base.notifications.quietHours, ...notifications?.quietHours },
-    },
-  };
-}
+export { mergePreferences };
 
 /** Reads saved preferences, ignoring anything invalid or unreadable. */
 export function loadPreferences(storage: Pick<Storage, 'getItem'> | undefined): Preferences {

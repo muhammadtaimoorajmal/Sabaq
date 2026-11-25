@@ -1,4 +1,9 @@
-import { type AuthResponse, registerInputSchema } from '@sabaq/shared';
+import {
+  type AuthResponse,
+  type Preferences,
+  type PreferencesUpdate,
+  registerInputSchema,
+} from '@sabaq/shared';
 import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router';
@@ -9,6 +14,8 @@ import { serverErrors, validate } from '../../auth/validation';
 import { Alert, Button, ErrorSummary, Field, Input, PasswordInput } from '../../components/ui';
 import { errorKey } from '../../i18n';
 import { useForm } from '../../lib/useForm';
+import { usePreferences } from '../../preferences/PreferencesProvider';
+import { browserTimeZone } from '../classes/helpers';
 import { AuthHeader, AuthSwitch, linkClass, withNext } from './parts';
 import { safeNext } from './SignInPage';
 
@@ -25,10 +32,21 @@ const toInput = (values: Values) => ({
   studentId: values.studentId.trim() || undefined,
 });
 
+/** The display settings chosen on this device, kept with the new account. */
+const devicePreferences = (preferences: Preferences): PreferencesUpdate => ({
+  theme: preferences.theme,
+  textScale: preferences.textScale,
+  density: preferences.density,
+  language: preferences.language,
+  motion: preferences.motion,
+  timeZone: browserTimeZone(),
+});
+
 /** Create an account in one step; the person is signed in straight away. */
 export function SignUpPage() {
   const { t } = useTranslation();
   const { state, signIn } = useAuth();
+  const { preferences } = usePreferences();
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const next = safeNext(params.get('next'));
@@ -42,12 +60,17 @@ export function SignUpPage() {
     mutationFn: (values: Values) =>
       api<AuthResponse>('/auth/register', {
         method: 'POST',
-        body: registerInputSchema.parse(toInput(values)),
+        body: registerInputSchema.parse({
+          ...toInput(values),
+          preferences: devicePreferences(preferences),
+        }),
         auth: false,
       }),
     onSuccess: (session) => {
       signIn(session);
-      void navigate(next, { replace: true });
+      // Straight into the welcome steps, unless the person was on their way somewhere, such
+      // as a class invitation link; Today then offers to finish setting up later.
+      void navigate(next === '/' ? '/welcome' : next, { replace: true });
     },
     onError: (error) => {
       if (error instanceof ApiRequestError && error.code === 'validation_failed') {

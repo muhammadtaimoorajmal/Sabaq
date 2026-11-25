@@ -1,8 +1,10 @@
-import { CalendarCheck } from 'lucide-react';
+import { CalendarCheck, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router';
+import { useCompleteOnboarding } from '../api/account';
 import { useClasses } from '../api/classes';
 import { useCurrentUser } from '../auth/AuthProvider';
-import { EmptyState } from '../components/ui';
+import { Button, buttonVariants, Card, EmptyState } from '../components/ui';
 import { ClassActions, ClassCard } from './classes/ClassesPage';
 
 /** The part of the day in the person's own time zone. */
@@ -23,6 +25,40 @@ export function greetingName(fullName: string): string {
   return TITLES.test(first) && second ? `${first} ${second}` : first;
 }
 
+/** Invites people who left the welcome steps early to finish them, until they do or dismiss it. */
+function FinishSetupCard() {
+  const { t } = useTranslation();
+  const dismiss = useCompleteOnboarding();
+  return (
+    <Card
+      role="region"
+      aria-labelledby="finish-setup"
+      className="flex flex-wrap items-center gap-4 border-primary/40 bg-primary-soft"
+    >
+      <Sparkles aria-hidden="true" className="size-6 shrink-0 text-primary-text" />
+      <div className="min-w-0 flex-1">
+        <h2 id="finish-setup" className="font-bold text-text">
+          {t('today.setup.title')}
+        </h2>
+        <p className="text-muted">{t('today.setup.body')}</p>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <Link to="/welcome" className={buttonVariants({ size: 'sm' })}>
+          {t('today.setup.action')}
+        </Link>
+        <Button
+          size="sm"
+          variant="ghost"
+          loading={dismiss.isPending}
+          onClick={() => dismiss.mutate()}
+        >
+          {t('today.setup.dismiss')}
+        </Button>
+      </div>
+    </Card>
+  );
+}
+
 /** The home page. Deadlines and announcements fill it once classes exist. */
 export function TodayPage({ now = new Date() }: { now?: Date }) {
   const { t, i18n } = useTranslation();
@@ -39,6 +75,7 @@ export function TodayPage({ now = new Date() }: { now?: Date }) {
           {t(`today.${partOfDay(now, timeZone)}`, { name: greetingName(user.name) })}
         </h1>
       </header>
+      {!user.onboardedAt && <FinishSetupCard />}
       {classes.data && classes.data.length > 0 ? (
         <section aria-labelledby="today-classes" className="flex flex-col gap-3">
           <h2 id="today-classes" className="text-xl font-bold text-text">

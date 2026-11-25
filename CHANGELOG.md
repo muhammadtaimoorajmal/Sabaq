@@ -7,6 +7,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 
+- Onboarding, profile and personalization: three skippable welcome steps after sign-up (about you, comfort, your class) with visible progress, and a reminder on Today until finished or dismissed; profile with name, student ID and a photo that is cropped and compressed on the device; settings for display, date and time (time format, first day of the week, time zone) and notifications (e-mail, frequency, quiet hours) that apply instantly and are saved to the account, so they follow the person to every device; download a copy of your data as JSON; delete the account with the password, after handing over classes that would otherwise be left without a manager. A new student is set up in well under two minutes, verified end to end.
 - Classes and membership: create a class (with section, term, institution and time zone) as its class representative or instructor; invite with a join code, a link that fills it in, the device's share sheet or a QR code, and replace the code when needed; join in one tap; members by role with role changes, removal and leaving (a class always keeps a manager; only instructors appoint or change instructors); courses with a weekly timetable, colors and duplicate-code protection; permission checks on every endpoint with clear refusals. A new student joins from a shared link in under 30 seconds, verified end to end.
 - Account screens: create an account (with a password strength meter that discourages common passwords, personal details and patterns), confirm the e-mail address from the e-mailed link or a reminder banner, sign in (Caps Lock warning, the remaining minutes of a locked account, optional one-tap demo accounts), forgotten and reset passwords, and change password in settings. Validation in plain language appears after leaving a field or on submit and clears as soon as a problem is fixed; forms work with password managers.
 - A development mailbox (`GET /api/dev/mail`) that keeps the e-mails the API would have sent when no e-mail service is configured; never available in production.
@@ -32,6 +33,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- Buttons wrap long labels instead of overflowing, and long e-mail addresses wrap in messages, so every screen fits a 320 px wide phone with text at 150%.
+- Sign-up keeps the display settings chosen before the account existed.
 - Class representatives can now edit the class, manage members and replace the join code, so classes they create can be run without an instructor account.
 - The error summary takes focus once per submit attempt instead of whenever its contents change, so correcting a field never moves focus away from it.
 - The greeting keeps a title with the first name ("Dr. Ayesha" rather than "Dr.").
