@@ -154,6 +154,59 @@ describe('settings', () => {
     ).toBeInTheDocument();
   });
 
+  it('shows the API’s field problems on the profile form', async () => {
+    const { user } = start('/settings', {
+      'PATCH /api/account/profile': () =>
+        json(400, {
+          error: {
+            code: 'validation_failed',
+            message: 'x',
+            requestId: 'r',
+            issues: [{ path: 'studentId', code: 'invalid_format', message: 'x' }],
+          },
+        }),
+    });
+    const profile = await screen.findByRole('region', { name: 'Profile' });
+    await user.click(within(profile).getByRole('button', { name: 'Save profile' }));
+    const studentId = within(profile).getByLabelText(/Student ID/);
+    await waitFor(() => expect(studentId).toHaveAttribute('aria-invalid', 'true'));
+    expect(studentId).toHaveAccessibleDescription(
+      /Use only letters, numbers, dots, dashes and underscores\./,
+    );
+  });
+
+  it('changes the first day of the week and the time zone', async () => {
+    const { user, fetchMock } = start('/settings', {
+      'PATCH /api/account/preferences': () => json(200, TEST_USER),
+    });
+    const regional = await screen.findByRole('region', { name: 'Date and time' });
+    await user.click(within(regional).getByRole('radio', { name: 'Saturday' }));
+    await user.selectOptions(within(regional).getByLabelText(/Time zone/), 'Europe/London');
+    await user.click(within(regional).getByRole('button', { name: /Use this device’s time zone/ }));
+    await waitFor(
+      () => expect(callsTo(fetchMock, 'PATCH', '/api/account/preferences')).toHaveLength(1),
+      { timeout: SAVE_DELAY_MS + 1000 },
+    );
+    const [, init] = callsTo(fetchMock, 'PATCH', '/api/account/preferences')[0] ?? [];
+    expect(JSON.parse(String(init?.body))).toMatchObject({ weekStartsOn: 6 });
+  });
+
+  it('ignores an incomplete quiet-hours time', async () => {
+    const { user } = start('/settings', {
+      'PATCH /api/account/preferences': () => json(200, TEST_USER),
+    });
+    const notifications = await screen.findByRole('region', { name: 'Notifications' });
+    await user.click(
+      within(notifications).getByRole('switch', { name: 'E-mail me important updates' }),
+    );
+    await user.click(within(notifications).getByRole('radio', { name: 'Once a day' }));
+    await user.click(within(notifications).getByRole('switch', { name: 'Quiet hours' }));
+    fireEvent.change(within(notifications).getByLabelText('Until'), { target: { value: '' } });
+    expect(
+      within(notifications).getByText('Quiet every day from 10:00 PM until 7:00 AM.'),
+    ).toBeInTheDocument();
+  });
+
   it('downloads a copy of the data', async () => {
     const createObjectURL = vi.fn(() => 'blob:export');
     vi.stubGlobal('URL', Object.assign(URL, { createObjectURL, revokeObjectURL: vi.fn() }));
