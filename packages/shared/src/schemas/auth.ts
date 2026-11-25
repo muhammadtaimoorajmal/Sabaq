@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { idSchema, isoDateTimeSchema } from './common.js';
-import { personNameSchema, studentIdSchema, userSchema } from './user.js';
+import { personNameSchema, preferencesUpdateSchema, studentIdSchema, userSchema } from './user.js';
 
 /**
  * Password policy following NIST SP 800-63B: a minimum length and a generous maximum,
@@ -23,6 +23,8 @@ export const registerInputSchema = z.object({
   email: emailSchema,
   password: passwordSchema,
   studentId: studentIdSchema.optional(),
+  /** Display settings chosen on this device before signing up, so they are kept. */
+  preferences: preferencesUpdateSchema.optional(),
 });
 export type RegisterInput = z.infer<typeof registerInputSchema>;
 

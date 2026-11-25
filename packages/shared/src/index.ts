@@ -15,6 +15,7 @@ export * from './schemas/user.js';
 // Domain logic
 export * from './domain/join-code.js';
 export * from './domain/permissions.js';
+export * from './domain/preferences.js';
 export * from './domain/submission.js';
 export * from './domain/time.js';
 export * from './domain/urgency.js';

@@ -90,6 +90,16 @@ export const studentIdSchema = z
   .max(32)
   .regex(/^[\w.-]+$/, 'Use only letters, numbers, dots, dashes and underscores');
 
+/**
+ * Where a profile photo is served from: an `https` address, or a path on the API itself such as
+ * `/api/users/<id>/avatar/<version>` (the version changes with every new photo, so browsers can
+ * cache each one forever).
+ */
+export const avatarUrlSchema = z.union([
+  z.url({ protocol: /^https$/ }),
+  z.string().regex(/^\/api\/users\/[a-f\d]{24}\/avatar\/[\w-]{1,64}$/),
+]);
+
 /** A user as returned by the API to its owner. */
 export const userSchema = z.object({
   id: idSchema,
@@ -97,9 +107,11 @@ export const userSchema = z.object({
   email: z.email(),
   emailVerified: z.boolean(),
   studentId: studentIdSchema.nullable(),
-  avatarUrl: z.url().nullable(),
+  avatarUrl: avatarUrlSchema.nullable(),
   platformRole: platformRoleSchema,
   preferences: preferencesSchema,
+  /** When the person finished or skipped the welcome steps; `null` until then. */
+  onboardedAt: isoDateTimeSchema.nullable(),
   createdAt: isoDateTimeSchema,
 });
 export type User = z.infer<typeof userSchema>;
@@ -115,3 +127,26 @@ export const profileUpdateSchema = z
   })
   .partial();
 export type ProfileUpdate = z.infer<typeof profileUpdateSchema>;
+
+/** Image types accepted for profile photos. */
+export const AVATAR_TYPES = ['image/webp', 'image/jpeg', 'image/png'] as const;
+/** Largest accepted profile photo, after the browser has resized it. */
+export const AVATAR_MAX_BYTES = 64 * 1024;
+/** Profile photos are resized to this many pixels square before upload. */
+export const AVATAR_SIZE = 256;
+
+/** A new profile photo, as a `data:` URL of a small square image. */
+export const avatarUploadSchema = z.object({
+  image: z
+    .string()
+    .max(Math.ceil((AVATAR_MAX_BYTES * 4) / 3) + 64)
+    .regex(
+      /^data:image\/(webp|jpeg|png);base64,[A-Za-z\d+/]+={0,2}$/,
+      'Choose a JPEG, PNG or WebP image',
+    ),
+});
+export type AvatarUpload = z.infer<typeof avatarUploadSchema>;
+
+/** Deleting an account needs the password again, so an unattended device cannot do it. */
+export const deleteAccountInputSchema = z.object({ password: z.string().min(1).max(128) });
+export type DeleteAccountInput = z.infer<typeof deleteAccountInputSchema>;

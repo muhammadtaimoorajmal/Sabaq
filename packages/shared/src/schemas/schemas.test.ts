@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
+  AVATAR_MAX_BYTES,
+  avatarUploadSchema,
+  avatarUrlSchema,
   changePasswordInputSchema,
   courseSessionSchema,
   createAnnouncementInputSchema,
@@ -8,6 +11,7 @@ import {
   createStudySlotInputSchema,
   createTaskInputSchema,
   DEFAULT_PREFERENCES,
+  deleteAccountInputSchema,
   idSchema,
   isValidTimeZone,
   joinClassInputSchema,
@@ -122,10 +126,41 @@ describe('users and preferences', () => {
       avatarUrl: null,
       platformRole: 'user',
       preferences: DEFAULT_PREFERENCES,
+      onboardedAt: null,
       createdAt: '2026-11-22T05:00:00.000Z',
     };
     expect(userSchema.parse(user)).toEqual(user);
     expect(userSchema.safeParse({ ...user, studentId: 'has spaces' }).success).toBe(false);
+  });
+
+  it('accepts photos served by the API or over https only', () => {
+    expect(avatarUrlSchema.safeParse(`/api/users/${ID}/avatar/k3x9`).success).toBe(true);
+    expect(avatarUrlSchema.safeParse('https://images.example.com/me.png').success).toBe(true);
+    expect(avatarUrlSchema.safeParse('http://images.example.com/me.png').success).toBe(false);
+    expect(avatarUrlSchema.safeParse('javascript:alert(1)').success).toBe(false);
+    expect(avatarUrlSchema.safeParse('/api/users/../avatar/1').success).toBe(false);
+  });
+
+  it('accepts small image data URLs as profile photos', () => {
+    expect(avatarUploadSchema.safeParse({ image: 'data:image/webp;base64,UklGRg==' }).success).toBe(
+      true,
+    );
+    expect(
+      avatarUploadSchema.safeParse({ image: 'data:image/svg+xml;base64,PHN2Zz4=' }).success,
+    ).toBe(false);
+    const huge = `data:image/png;base64,${'A'.repeat(AVATAR_MAX_BYTES * 2)}`;
+    expect(avatarUploadSchema.safeParse({ image: huge }).success).toBe(false);
+  });
+
+  it('keeps display settings chosen before signing up', () => {
+    const input = registerInputSchema.parse({
+      name: 'Sara Javed',
+      email: 'Sara@Example.com',
+      password: 'a quiet library afternoon',
+      preferences: { theme: 'dark', timeZone: 'Asia/Karachi' },
+    });
+    expect(input.preferences).toEqual({ theme: 'dark', timeZone: 'Asia/Karachi' });
+    expect(deleteAccountInputSchema.safeParse({ password: '' }).success).toBe(false);
   });
 });
 
