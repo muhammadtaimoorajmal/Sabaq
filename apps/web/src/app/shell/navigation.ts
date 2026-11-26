@@ -1,11 +1,13 @@
-import { CalendarCheck, type LucideIcon, School, Settings } from 'lucide-react';
+import { CalendarCheck, Inbox, type LucideIcon, School, Settings } from 'lucide-react';
 
 export interface NavItem {
   to: string;
-  label: 'nav.today' | 'nav.classes' | 'nav.settings';
+  label: 'nav.today' | 'nav.inbox' | 'nav.classes' | 'nav.settings';
   icon: LucideIcon;
   /** Match only this exact path (for the home page). */
   end?: boolean;
+  /** Shows the number of unread announcements. */
+  showsUnread?: boolean;
 }
 
 /**
@@ -14,6 +16,7 @@ export interface NavItem {
  */
 export const NAV_ITEMS: NavItem[] = [
   { to: '/', label: 'nav.today', icon: CalendarCheck, end: true },
+  { to: '/inbox', label: 'nav.inbox', icon: Inbox, showsUnread: true },
   { to: '/classes', label: 'nav.classes', icon: School },
   { to: '/settings', label: 'nav.settings', icon: Settings },
 ];

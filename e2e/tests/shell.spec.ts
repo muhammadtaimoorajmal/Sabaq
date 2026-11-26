@@ -80,6 +80,7 @@ const PAGES = [
   { path: '/verify-email', signedIn: false },
   { path: '/', signedIn: true },
   { path: '/settings', signedIn: true },
+  { path: '/inbox', signedIn: true },
   { path: '/design-system', signedIn: false },
   { path: '/no-such-page', signedIn: false },
 ];

@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import { relativeTime } from '../pages/SettingsPage';
+import { relativeTime } from '../lib/dates';
 import { safeNext } from '../pages/auth/SignInPage';
 import { greetingName, partOfDay } from '../pages/TodayPage';
 import { AppErrorBoundary } from './App';

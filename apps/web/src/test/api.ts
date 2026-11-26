@@ -45,6 +45,8 @@ const DEFAULTS: Handlers = {
   'POST /api/auth/refresh': () => apiError(401, 'session_expired'),
   'POST /api/auth/logout': () => json(204),
   'GET /api/classes': () => json(200, []),
+  'GET /api/announcements': () => json(200, { items: [], nextBefore: null }),
+  'GET /api/announcements/unread': () => json(200, { total: 0, byClass: {} }),
 };
 
 /**

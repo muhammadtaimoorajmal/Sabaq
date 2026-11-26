@@ -18,6 +18,7 @@ import {
   Skeleton,
 } from '../components/ui';
 import { errorKey } from '../i18n';
+import { relativeTime } from '../lib/dates';
 import { PreferencesPanel } from '../preferences/PreferencesPanel';
 import { AccountDataCard } from './account/AccountDataCard';
 import { AvatarPicker } from './account/AvatarPicker';
@@ -25,21 +26,6 @@ import { NotificationSettings } from './account/NotificationSettings';
 import { ProfileForm } from './account/ProfileForm';
 import { RegionalSettings } from './account/RegionalSettings';
 import { ChangePasswordCard } from './ChangePasswordCard';
-
-/** "3 minutes ago", "yesterday" … in the interface language. */
-export function relativeTime(iso: string, language: string, now = Date.now()): string {
-  const seconds = Math.round((new Date(iso).getTime() - now) / 1000);
-  const format = new Intl.RelativeTimeFormat(language, { numeric: 'auto' });
-  const units: [Intl.RelativeTimeFormatUnit, number][] = [
-    ['day', 86_400],
-    ['hour', 3600],
-    ['minute', 60],
-  ];
-  for (const [unit, size] of units) {
-    if (Math.abs(seconds) >= size) return format.format(Math.round(seconds / size), unit);
-  }
-  return format.format(0, 'minute');
-}
 
 function Devices() {
   const { t, i18n } = useTranslation();

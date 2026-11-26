@@ -1,6 +1,7 @@
 import { LogOut, Settings, SlidersHorizontal } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, NavLink, useNavigate } from 'react-router';
+import { useUnreadCount } from '../../api/announcements';
 import { apiAsset } from '../../api/client';
 import { useAuth, useCurrentUser } from '../../auth/AuthProvider';
 import {
@@ -101,6 +102,7 @@ export function AccountMenu() {
 export function PrimaryNavigation() {
   const { t } = useTranslation();
   const wide = useMediaQuery(WIDE_SCREEN);
+  const unread = useUnreadCount().data?.total ?? 0;
   return (
     <nav
       aria-label={t('nav.label')}
@@ -110,7 +112,7 @@ export function PrimaryNavigation() {
           : 'fixed inset-x-0 bottom-0 z-30 flex border-t-default border-border bg-surface pb-[env(safe-area-inset-bottom)] shadow-lg',
       )}
     >
-      {NAV_ITEMS.map(({ to, label, icon: Icon, end }) => (
+      {NAV_ITEMS.map(({ to, label, icon: Icon, end, showsUnread }) => (
         <NavLink
           key={to}
           to={to}
@@ -125,8 +127,31 @@ export function PrimaryNavigation() {
             )
           }
         >
-          <Icon aria-hidden="true" className={wide ? 'size-5' : 'size-6'} />
+          <span className="relative">
+            <Icon aria-hidden="true" className={wide ? 'size-5' : 'size-6'} />
+            {showsUnread && unread > 0 && !wide && (
+              <span
+                aria-hidden="true"
+                className="absolute -end-2.5 -top-1.5 min-w-5 rounded-full bg-danger px-1 text-center text-xs leading-5 font-bold text-danger-fg"
+              >
+                {unread > 99 ? '99+' : unread}
+              </span>
+            )}
+          </span>
           {t(label)}
+          {showsUnread && unread > 0 && (
+            <>
+              {wide && (
+                <span
+                  aria-hidden="true"
+                  className="ms-auto min-w-6 rounded-full bg-danger px-1.5 text-center text-sm leading-6 font-bold text-danger-fg"
+                >
+                  {unread > 99 ? '99+' : unread}
+                </span>
+              )}
+              <span className="sr-only"> {t('nav.unread', { count: unread })}</span>
+            </>
+          )}
         </NavLink>
       ))}
     </nav>

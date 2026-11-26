@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { expectNoViolations, newEmail, signIn } from './helpers';
+import { expectNoViolations, newEmail, scrollsSideways, signIn } from './helpers';
 
 /** The demo class's join code (see the API's demo data). */
 const DEMO_CODE = 'NRTH-5A26';
@@ -20,8 +20,11 @@ test('a new student joins a class from a shared link in under 30 seconds', async
   await expect(
     page.getByRole('heading', { level: 1, name: 'BS Computer Science · 5A' }),
   ).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Human-Computer Interaction' })).toBeVisible();
+  // The class opens on its announcements; the courses are one tab away.
+  await expect(page.getByRole('tab', { name: 'Announcements', selected: true })).toBeVisible();
   expect(Date.now() - started).toBeLessThan(30_000);
+  await page.getByRole('tab', { name: 'Courses' }).click();
+  await expect(page.getByRole('heading', { name: 'Human-Computer Interaction' })).toBeVisible();
 
   // Students see the class, but not its management tools.
   await expect(page.getByRole('tab', { name: 'Settings' })).toHaveCount(0);
@@ -43,6 +46,7 @@ test('an instructor creates a class, adds a course and sees the invite card', as
   ).toBeVisible();
   await expect(page.getByText(/^[A-Z2-9]{4}-[A-Z2-9]{4}$/)).toBeVisible();
 
+  await page.getByRole('tab', { name: 'Courses' }).click();
   await page.getByRole('button', { name: 'Add a course' }).first().click();
   const sheet = page.getByRole('dialog', { name: 'Add a course' });
   await sheet.getByLabel(/Course code/).fill('SE-210');
@@ -71,6 +75,21 @@ test('the class representative manages the demo class', async ({ page }) => {
   await page.getByRole('tab', { name: 'Settings' }).click();
   await expect(page.locator('#edit-class-name')).toHaveValue('BS Computer Science · 5A');
   await expectNoViolations(page);
+});
+
+test.describe('a class on a small screen', () => {
+  test.use({ viewport: { width: 320, height: 640 } });
+
+  test('fits 320 px without sideways scrolling, with every tab reachable', async ({ page }) => {
+    await signIn(page);
+    await page.getByRole('link', { name: 'Classes' }).first().click();
+    await page.getByRole('link', { name: /BS Computer Science/ }).click();
+    await expect(page.getByRole('tab', { name: 'Announcements', selected: true })).toBeVisible();
+    expect(await scrollsSideways(page)).toBe(false);
+    await page.getByRole('tab', { name: 'Members' }).click();
+    await expect(page.getByRole('tab', { name: 'Members', selected: true })).toBeVisible();
+    expect(await scrollsSideways(page)).toBe(false);
+  });
 });
 
 test.describe('accessibility of class pages', () => {

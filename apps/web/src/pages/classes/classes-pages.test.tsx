@@ -198,7 +198,7 @@ describe('a class', () => {
   });
 
   it('shows courses with their timetable', async () => {
-    start(`/classes/${CLASS_ID}`);
+    start(`/classes/${CLASS_ID}?tab=courses`);
     expect(
       await screen.findByRole('heading', { name: 'Human-Computer Interaction' }),
     ).toBeInTheDocument();
@@ -208,7 +208,7 @@ describe('a class', () => {
 
   it('adds a course with a session, checking the times and duplicate codes', async () => {
     let attempts = 0;
-    const { user, fetchMock } = start(`/classes/${CLASS_ID}`, {
+    const { user, fetchMock } = start(`/classes/${CLASS_ID}?tab=courses`, {
       [`GET /api/classes/${CLASS_ID}/courses`]: () => json(200, []),
       [`POST /api/classes/${CLASS_ID}/courses`]: ({ body }) =>
         attempts++ === 0
@@ -260,7 +260,7 @@ describe('a class', () => {
   });
 
   it('edits and removes a course', async () => {
-    const { user, fetchMock } = start(`/classes/${CLASS_ID}`, {
+    const { user, fetchMock } = start(`/classes/${CLASS_ID}?tab=courses`, {
       [`PATCH /api/classes/${CLASS_ID}/courses/${COURSE.id}`]: () => json(200, COURSE),
       [`DELETE /api/classes/${CLASS_ID}/courses/${COURSE.id}`]: () => json(204),
     });
@@ -361,7 +361,7 @@ describe('a class', () => {
   });
 
   it('hides management from students', async () => {
-    start(`/classes/${CLASS_ID}`, {
+    start(`/classes/${CLASS_ID}?tab=courses`, {
       [`GET /api/classes/${CLASS_ID}`]: () => json(200, cls({ role: 'student' })),
     });
     await screen.findByRole('heading', { name: 'Human-Computer Interaction' });

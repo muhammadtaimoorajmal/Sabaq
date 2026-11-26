@@ -74,6 +74,22 @@ Every route needs a session. People outside a class get `404`, so class identifi
 
 A class always keeps at least one instructor or class representative: the last one cannot leave or step down (`last_manager`).
 
+### Announcements
+
+The feed covers every class the person belongs to; posting and managing happen in one class.
+
+| Method and path | Purpose | Who |
+| --- | --- | --- |
+| `GET /api/announcements` | The feed: pinned first (on the first page), then newest. Filters: `classId`, `type`, `unread=true`, `q` (words in the title or body), `before` and `limit` for paging | Members |
+| `GET /api/announcements/unread` | Unread counts, in total and per class | Members |
+| `POST /api/announcements/seen` | Record that announcements were seen (`ids`, up to 100); unknown ones are ignored | Members |
+| `POST /api/classes/:id/announcements` | Post one of six types: `deadline` and `assessment` (with `dueAt`, `taskType`; they create one class task for every member), `venue_change` (`startsAt`, `venue`), `cancellation` (`startsAt`), `material`, `general` | Instructors, class representatives |
+| `PATCH /api/classes/:id/announcements/:announcementId` | Edit; every change is recorded with the fields that changed. Pinning is not an edit. Changing `dueAt`, `startsAt` or `venue` makes it unread again for everyone and notifies them; the class task follows | The author, instructors |
+| `DELETE /api/classes/:id/announcements/:announcementId` | Delete, with its task, receipts and notifications | The author, instructors |
+| `GET /api/classes/:id/announcements/:announcementId/receipts` | Who has seen it and who has not (current members other than the author) | Instructors, class representatives |
+
+Members are notified of new posts and important changes. A notification created during someone's quiet hours is delivered when they end, in that person's time zone.
+
 ### Your account (`/api/account`)
 
 Every route needs a session and acts on the signed-in person only.
@@ -174,6 +190,7 @@ src/
 ├── server.ts         Listening and graceful shutdown
 ├── config/env.ts     Environment variables and their validation
 ├── account/          Profile, photo, preferences, welcome steps, data export, account deletion
+├── announcements/    Structured announcements, receipts and the unread feed
 ├── auth/             Sign-in, sessions, tokens, e-mail verification, passwords
 ├── classes/          Classes, memberships, roles and courses
 ├── db/               Connection, models, demo data

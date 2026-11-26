@@ -166,7 +166,7 @@ For the product itself, see the [vision](vision.md).
 - First-run onboarding with progress and a skip option; profile; settings for theme, text size, density, language, reduced motion, notifications and quiet hours, applied instantly and synced across devices; data export and account deletion.
 - **Done when:** a new user is set up in under two minutes.
 
-### M19 · Structured announcements and receipts
+### M19 · Structured announcements and receipts ✅
 
 - Typed announcements (deadline, quiz or exam, venue change, cancellation, material, general) with type-specific fields; deadline announcements create a task for every member; visible edit history; pinning; "seen by" receipts with the list of who has not seen it; inbox with filters and unread state.
 - **Done when:** a post reaches every member and receipts update live.

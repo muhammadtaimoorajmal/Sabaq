@@ -20,6 +20,7 @@ import {
   Tabs,
 } from '../../components/ui';
 import { errorKey } from '../../i18n';
+import { AnnouncementFeed } from '../announcements/AnnouncementFeed';
 import { NotFoundPage } from '../StatusPages';
 import { ClassDetailsForm } from './ClassDetailsForm';
 import { CoursesTab } from './CoursesTab';
@@ -91,10 +92,10 @@ function SettingsTab({ cls }: { cls: ClassForMember }) {
   );
 }
 
-const TABS = ['courses', 'members', 'settings'] as const;
+const TABS = ['announcements', 'courses', 'members', 'settings'] as const;
 type TabName = (typeof TABS)[number];
 
-/** One class: invite card, then courses, members and (for managers) settings. */
+/** One class: invite card, then announcements, courses, members and (for managers) settings. */
 export function ClassPage() {
   const { t } = useTranslation();
   const { classId = '' } = useParams();
@@ -125,7 +126,7 @@ export function ClassPage() {
   const canSettings = allowed(user, data, 'class.update');
   const tabs = TABS.filter((tab) => tab !== 'settings' || canSettings);
   const requested = params.get('tab') as TabName | null;
-  const tab = requested && tabs.includes(requested) ? requested : 'courses';
+  const tab = requested && tabs.includes(requested) ? requested : 'announcements';
 
   return (
     <div className="flex flex-col gap-6">
@@ -156,6 +157,9 @@ export function ClassPage() {
             </Tab>
           ))}
         </TabList>
+        <TabPanel value="announcements">
+          <AnnouncementFeed classId={data.id} />
+        </TabPanel>
         <TabPanel value="courses">
           <CoursesTab cls={data} />
         </TabPanel>

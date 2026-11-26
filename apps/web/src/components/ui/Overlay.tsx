@@ -127,10 +127,16 @@ export const MenuSeparator = () => <MenuPrimitive.Separator className="my-1 h-px
 
 export const Tabs = TabsPrimitive.Root;
 
-/** Tab buttons. Arrow keys switch tabs; the selected tab is the only tab stop. */
+/**
+ * Tab buttons. Arrow keys switch tabs; the selected tab is the only tab stop. On narrow
+ * screens the row scrolls sideways on its own, so the page never does (WCAG 1.4.10).
+ */
 export function TabList({ children, label }: { children: ReactNode; label: string }) {
   return (
-    <TabsPrimitive.List aria-label={label} className="flex gap-1 border-b-default border-border">
+    <TabsPrimitive.List
+      aria-label={label}
+      className="flex gap-1 overflow-x-auto border-b-default border-border [scrollbar-width:thin]"
+    >
       {children}
     </TabsPrimitive.List>
   );
@@ -140,7 +146,7 @@ export function Tab({ value, children }: { value: string; children: ReactNode })
   return (
     <TabsPrimitive.Trigger
       value={value}
-      className="-mb-px min-h-control border-b-[3px] border-transparent px-4 font-semibold text-muted hover:text-text data-[state=active]:border-primary data-[state=active]:text-text"
+      className="min-h-control shrink-0 border-b-[3px] border-transparent px-4 font-semibold whitespace-nowrap text-muted hover:text-text data-[state=active]:border-primary data-[state=active]:text-text"
     >
       {children}
     </TabsPrimitive.Trigger>

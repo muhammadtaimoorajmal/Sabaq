@@ -52,6 +52,19 @@ Open <http://localhost:5173> and sign in with the demo student `zara.ahmed@north
 | Choose a new password | `/reset-password#token=…` | Strength meter; clear next steps for expired or incomplete links |
 | Change password | Settings | Needs the current password; signs out other devices |
 
+## Announcements
+
+| Screen | Path | Highlights |
+| --- | --- | --- |
+| Inbox | `/inbox` | Every class's announcements; unread count in the navigation; filters for unread, type and words; "Mark all as read" |
+| Class announcements | `/classes/:id` (first tab) | The same feed for one class; `?announcement=<id>` (used by notifications) scrolls to and focuses that announcement |
+
+- **One line that matters.** Each card leads with its type (icon and name, never color alone), course and class, then the one fact a student needs, such as "Due Friday, January 8 at 11:59 PM" in their own time zone and clock.
+- **Honest "seen".** An announcement counts as seen only after it has been mostly on screen for a second; quickly scrolling past does not count. Announcements seen together are reported in one request.
+- **Changes are never missed.** An announcement whose time or place changed after someone saw it is marked "Updated since you saw it", and its edit history says who changed what and when.
+- **Receipts for senders.** Instructors and class representatives see "Seen by 18 of 31" on each card, and a panel listing who has not seen it yet, refreshed every few seconds while open.
+- **A composer that asks only what applies.** The type comes first and decides the fields (a deadline needs a due time and creates a task for everyone; a venue change needs the new room). Dates are entered in the class's time zone, links are checked, and a live preview shows exactly what students will see.
+
 ## Onboarding and settings
 
 | Screen | Path | Highlights |

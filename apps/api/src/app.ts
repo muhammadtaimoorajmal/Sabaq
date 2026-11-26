@@ -6,6 +6,8 @@ import helmet from 'helmet';
 import type { Logger } from 'pino';
 import { accountRouter, usersRouter } from './account/routes.js';
 import { AccountService } from './account/service.js';
+import { announcementFeedRouter, classAnnouncementsRouter } from './announcements/routes.js';
+import { AnnouncementService } from './announcements/service.js';
 import { requireAuth } from './auth/middleware.js';
 import { authRouter } from './auth/routes.js';
 import { AuthService } from './auth/service.js';
@@ -93,7 +95,15 @@ export function createApp({
   const auth = new AuthService({ config, mailer, logger, now });
   app.use('/api/auth', authRouter({ service: auth, config, now }));
   const authenticated = requireAuth({ service: auth, secret: config.auth.jwtSecret, now });
-  app.use('/api/classes', classesRouter({ service: new ClassService(), authenticated }));
+  const classes = new ClassService();
+  const announcements = new AnnouncementService({ logger, now });
+  // Mounted before the classes router, which answers every other /api/classes path.
+  app.use(
+    '/api/classes/:classId/announcements',
+    classAnnouncementsRouter({ service: announcements, classes, authenticated }),
+  );
+  app.use('/api/classes', classesRouter({ service: classes, authenticated }));
+  app.use('/api/announcements', announcementFeedRouter({ service: announcements, authenticated }));
   const account = new AccountService({ logger, now });
   app.use('/api/account', accountRouter({ service: account, authenticated, config }));
   app.use('/api/users', usersRouter({ service: account }));

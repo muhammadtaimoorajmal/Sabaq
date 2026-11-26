@@ -1,4 +1,9 @@
-import { ANNOUNCEMENT_TYPES, type AnnouncementType } from '@sabaq/shared';
+import {
+  ANNOUNCEMENT_TYPES,
+  type AnnouncementType,
+  TASK_TYPES,
+  type TaskType,
+} from '@sabaq/shared';
 import { model, Schema } from 'mongoose';
 import {
   baseOptions,
@@ -27,6 +32,8 @@ export interface AnnouncementRecord extends Timestamps {
   dueAt: Date | null;
   startsAt: Date | null;
   venue: string | null;
+  /** For deadlines and assessments: the type of the task created for every member. */
+  taskType: TaskType | null;
   /** The class task created from a deadline or assessment announcement. */
   taskId: ObjectId | null;
   /** Every edit is kept, so students can see what changed and when. */
@@ -57,6 +64,7 @@ const announcementSchema = new Schema<AnnouncementRecord>(
     dueAt: { type: Date, default: null },
     startsAt: { type: Date, default: null },
     venue: nullableString(120),
+    taskType: { type: String, enum: [...TASK_TYPES, null], default: null },
     taskId: nullableRef('Task'),
     edits: {
       type: [

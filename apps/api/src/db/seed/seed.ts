@@ -207,6 +207,7 @@ export async function seedDemoData({
         dueAt,
         startsAt: null,
         venue: isAssessment ? (course.schedule[0]?.venue ?? null) : null,
+        taskType: plan.type,
         taskId,
         edits: extended
           ? [{ editedAt, editedBy: createdBy, changedFields: ['dueAt', 'body'] }]
@@ -236,6 +237,7 @@ export async function seedDemoData({
       dueAt: null,
       startsAt: session?.startsAt ?? null,
       venue: plan.venue ?? null,
+      taskType: null,
       taskId: null,
       edits: [],
       ...stamp(postedAt),
