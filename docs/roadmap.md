@@ -171,7 +171,7 @@ For the product itself, see the [vision](vision.md).
 - Typed announcements (deadline, quiz or exam, venue change, cancellation, material, general) with type-specific fields; deadline announcements create a task for every member; visible edit history; pinning; "seen by" receipts with the list of who has not seen it; inbox with filters and unread state.
 - **Done when:** a post reaches every member and receipts update live.
 
-### M20 · Paste-to-structure assistant
+### M20 · Paste-to-structure assistant ✅
 
 - A parser in the shared package that extracts date and time (including relative forms such as "next Wednesday 11 pm"), course, venue, task type and naming pattern from free text; extracted fields are highlighted for confirmation before anything is posted; a test corpus of realistic anonymized messages.
 - **Done when:** at least 90% field accuracy on the corpus; nothing is posted without confirmation.

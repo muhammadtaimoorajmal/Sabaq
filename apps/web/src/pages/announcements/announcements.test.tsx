@@ -409,3 +409,91 @@ describe('details', () => {
     expect(within(sheet).getByText('Nobody has seen it yet.')).toBeInTheDocument();
   });
 });
+
+describe('paste a message', () => {
+  const openComposer = async (handlers: Handlers = {}) => {
+    const app = start(
+      `/classes/${CLASS_ID}`,
+      {
+        [`POST /api/classes/${CLASS_ID}/announcements`]: () => json(201, announcement()),
+        ...handlers,
+      },
+      'class_rep',
+    );
+    await app.user.click(await screen.findByRole('button', { name: 'Post announcement' }));
+    const sheet = await screen.findByRole('dialog', { name: 'Post an announcement' });
+    return { ...app, sheet };
+  };
+
+  it('fills in the form from a chat message, marks what it found and posts only on request', async () => {
+    const { user, sheet, fetchMock } = await openComposer();
+    await user.click(within(sheet).getByRole('button', { name: 'Fill in the form' }));
+    expect(within(sheet).getByText('Paste a message first.')).toBeInTheDocument();
+
+    await user.type(
+      within(sheet).getByLabelText('Message'),
+      'AoA! HCI Lab 11 report due next Wed 11pm. Name it Lab11_RollNo_Section.pdf, upload on LMS',
+    );
+    await user.click(within(sheet).getByRole('button', { name: 'Fill in the form' }));
+
+    const status = within(sheet).getByRole('status');
+    expect(within(status).getByText('HCI', { selector: 'mark' })).toHaveTextContent('HCI (course)');
+    expect(within(status).getByText(/^next Wed/, { selector: 'mark' })).toBeInTheDocument();
+    expect(within(status).getByText('Type: Deadline')).toBeInTheDocument();
+    expect(
+      within(status).getByText('Course: CS-341 · Human-Computer Interaction'),
+    ).toBeInTheDocument();
+
+    expect(within(sheet).getByLabelText(/^Title/)).toHaveValue('CS-341 Lab 11 report');
+    expect(within(sheet).getByLabelText('Course')).toHaveValue(COURSE.id);
+    expect(within(sheet).getByLabelText('Kind of task')).toHaveValue('lab');
+    expect(within(sheet).getByLabelText(/^Title/)).toHaveAccessibleDescription(
+      /Filled in from the message; check it\./,
+    );
+    expect(within(sheet).getByText('Lab11_{STUDENT_ID}_{SECTION}.pdf')).toBeInTheDocument();
+    expect(
+      within(sheet).getByText('Where to submit: the learning management system'),
+    ).toBeInTheDocument();
+
+    // Changing a field removes its "filled in" note.
+    await user.type(within(sheet).getByLabelText(/^Title/), ' (draft)');
+    expect(within(sheet).getByLabelText(/^Title/)).not.toHaveAccessibleDescription(/Filled in/);
+    expect(callsTo(fetchMock, 'POST', `/api/classes/${CLASS_ID}/announcements`)).toHaveLength(0);
+
+    await user.click(within(sheet).getByRole('button', { name: 'Post announcement' }));
+    await waitFor(() =>
+      expect(callsTo(fetchMock, 'POST', `/api/classes/${CLASS_ID}/announcements`)).toHaveLength(1),
+    );
+    const [, init] = callsTo(fetchMock, 'POST', `/api/classes/${CLASS_ID}/announcements`)[0] ?? [];
+    const body = JSON.parse(String(init?.body));
+    expect(body).toMatchObject({
+      type: 'deadline',
+      taskType: 'lab',
+      courseId: COURSE.id,
+      submissionRule: {
+        namingPattern: 'Lab11_{STUDENT_ID}_{SECTION}',
+        allowedExtensions: ['pdf'],
+        channel: { kind: 'lms' },
+      },
+    });
+    // 11 pm in Karachi.
+    expect(body.dueAt).toMatch(/T18:00:00\.000Z$/);
+  });
+
+  it('says when it assumed a time or found no date, and lets the file rules go', async () => {
+    const { user, sheet } = await openComposer();
+    await user.type(within(sheet).getByLabelText('Message'), 'HCI quiz tomorrow');
+    await user.click(within(sheet).getByRole('button', { name: 'Fill in the form' }));
+    expect(
+      within(sheet).getByText('The message gives no time, so one was assumed. Check it below.'),
+    ).toBeInTheDocument();
+
+    await user.clear(within(sheet).getByLabelText('Message'));
+    await user.type(within(sheet).getByLabelText('Message'), 'Submit report as Report_RollNo');
+    await user.click(within(sheet).getByRole('button', { name: 'Fill in again' }));
+    expect(within(sheet).getByText('No date was found. Add it below.')).toBeInTheDocument();
+    await user.click(within(sheet).getByRole('button', { name: 'Remove file rules' }));
+    expect(within(sheet).queryByText('File rules from the message')).not.toBeInTheDocument();
+    expect(await accessibilityViolations()).toEqual([]);
+  });
+});

@@ -65,6 +65,10 @@ Open <http://localhost:5173> and sign in with the demo student `zara.ahmed@north
 - **Receipts for senders.** Instructors and class representatives see "Seen by 18 of 31" on each card, and a panel listing who has not seen it yet, refreshed every few seconds while open.
 - **A composer that asks only what applies.** The type comes first and decides the fields (a deadline needs a due time and creates a task for everyone; a venue change needs the new room). Dates are entered in the class's time zone, links are checked, and a live preview shows exactly what students will see.
 
+### Paste a message
+
+The composer starts with "Paste a message": a message from the class chat fills in the form (type, course, title, kind of task, due date or class time, venue and file rules). The message is shown with every detected detail highlighted and labelled for screen readers, a summary lists what was understood and anything assumed ("The message gives no time, so one was assumed"), and every filled-in field says "Filled in from the message; check it" until the sender changes it. Nothing is posted until the sender presses Post.
+
 ## Onboarding and settings
 
 | Screen | Path | Highlights |

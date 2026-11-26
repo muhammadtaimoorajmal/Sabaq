@@ -79,3 +79,32 @@ test('the inbox and the composer have no accessibility problems', async ({ page 
   await expect(page.getByRole('dialog', { name: 'Post an announcement' })).toBeVisible();
   await expectNoViolations(page);
 });
+
+test('a class representative turns a pasted chat message into an announcement', async ({
+  page,
+}) => {
+  const number = Math.floor(Math.random() * 90) + 10;
+  await signInAsClassRep(page);
+  await page.getByRole('link', { name: 'Classes' }).first().click();
+  await page.getByRole('link', { name: /BS Computer Science/ }).click();
+  await page.getByRole('button', { name: 'Post announcement' }).click();
+  const composer = page.getByRole('dialog', { name: 'Post an announcement' });
+  await composer
+    .getByLabel('Message', { exact: true })
+    .fill(
+      `AoA everyone! HCI Lab ${number} report is due next Wed 11pm. Name your file Lab${number}_RollNo_Section.pdf and upload on LMS.`,
+    );
+  await composer.getByRole('button', { name: 'Fill in the form' }).click();
+
+  // Everything found is highlighted and listed for checking; nothing is posted yet.
+  await expect(composer.getByText('Type: Deadline')).toBeVisible();
+  await expect(composer.getByLabel(/^Title/)).toHaveValue(new RegExp(`Lab ${number} report$`));
+  await expect(composer.getByText(`Lab${number}_{STUDENT_ID}_{SECTION}.pdf`)).toBeVisible();
+  await expectNoViolations(page);
+
+  await composer.getByRole('button', { name: 'Post announcement' }).click();
+  await expect(page.getByText(/Posted to BS Computer Science/)).toBeVisible();
+  const card = page.getByRole('article', { name: new RegExp(`Lab ${number} report$`) });
+  await expect(card).toBeVisible();
+  await expect(card.getByText(/^Due Wednesday/)).toBeVisible();
+});

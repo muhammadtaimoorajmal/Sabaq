@@ -4,6 +4,8 @@ import {
   type AnnouncementType,
   type ClassForMember,
   createAnnouncementInputSchema,
+  type PastedAnnouncement,
+  type SubmissionChannelKind,
   type TaskType,
   type UpdateAnnouncementInput,
   webUrlSchema,
@@ -34,6 +36,7 @@ import {
 import { errorKey } from '../../i18n';
 import { cn } from '../../lib/cn';
 import { AnnouncementCard } from './AnnouncementCard';
+import { PastePanel } from './PastePanel';
 import { TYPE_META } from './meta';
 
 const DEADLINE_TASKS: TaskType[] = ['assignment', 'lab', 'project', 'reading', 'other'];
@@ -51,6 +54,14 @@ interface Draft {
   taskType: TaskType;
   links: { label: string; url: string }[];
   pinned: boolean;
+  /** File rules read from a pasted message (deadlines only). */
+  submission: PastedRule | null;
+}
+
+interface PastedRule {
+  namingPattern: string | null;
+  allowedExtensions: string[];
+  channel: SubmissionChannelKind | null;
 }
 
 const draftFrom = (classId: string, announcement: AnnouncementForUser | null): Draft => ({
@@ -65,6 +76,7 @@ const draftFrom = (classId: string, announcement: AnnouncementForUser | null): D
   taskType: announcement?.taskType ?? 'assignment',
   links: announcement?.links ?? [],
   pinned: announcement?.pinned ?? false,
+  submission: null,
 });
 
 const needsDue = (type: AnnouncementType) => type === 'deadline' || type === 'assessment';
@@ -82,7 +94,20 @@ export function createInput(draft: Draft) {
     pinned: draft.pinned,
   };
   const venue = draft.venue.trim() || null;
-  if (draft.type === 'deadline') return { ...base, dueAt: draft.dueAt, taskType: draft.taskType };
+  if (draft.type === 'deadline') {
+    return {
+      ...base,
+      dueAt: draft.dueAt,
+      taskType: draft.taskType,
+      ...(draft.submission && {
+        submissionRule: {
+          namingPattern: draft.submission.namingPattern,
+          allowedExtensions: draft.submission.allowedExtensions,
+          channel: { kind: draft.submission.channel ?? 'other', label: null, url: null },
+        },
+      }),
+    };
+  }
   if (draft.type === 'assessment') {
     return { ...base, dueAt: draft.dueAt, taskType: draft.taskType, venue };
   }
@@ -93,9 +118,11 @@ export function createInput(draft: Draft) {
 
 /** The request body for an edit: every field the type has; the API records what changed. */
 export function updateInput(draft: Draft): UpdateAnnouncementInput {
-  const { type: _type, ...fields } = createInput(draft) as Record<string, unknown> & {
-    type: AnnouncementType;
-  };
+  const {
+    type: _type,
+    submissionRule: _rule,
+    ...fields
+  } = createInput(draft) as Record<string, unknown> & { type: AnnouncementType };
   return fields as UpdateAnnouncementInput;
 }
 
@@ -130,7 +157,54 @@ export function AnnouncementComposer({
   const editing = announcement !== null;
   const mutation = editing ? update : create;
   const timeZone = cls?.timeZone ?? user.preferences.timeZone;
-  const set = (change: Partial<Draft>) => setDraft((current) => ({ ...current, ...change }));
+  /** Fields filled in from a pasted message, marked until the sender changes them. */
+  const [detected, setDetected] = useState<Set<string>>(new Set());
+  const set = (change: Partial<Draft>) => {
+    setDraft((current) => ({ ...current, ...change }));
+    setDetected((current) => {
+      const next = new Set(current);
+      for (const key of Object.keys(change)) next.delete(key === 'startsAt' ? 'dueAt' : key);
+      return next;
+    });
+  };
+  const checkHint = (field: string, hint?: string) =>
+    detected.has(field)
+      ? [hint, t('announcements.paste.fromMessage')].filter(Boolean).join(' ')
+      : hint;
+  const applyPaste = (result: PastedAnnouncement) => {
+    setDraft((current) => ({
+      ...current,
+      type: result.type,
+      taskType: result.taskType ?? (result.type === 'assessment' ? 'quiz' : 'assignment'),
+      courseId: result.courseId ?? current.courseId,
+      title: result.title,
+      body: result.body,
+      dueAt: needsDue(result.type) ? result.when : current.dueAt,
+      startsAt: needsStart(result.type) ? result.when : current.startsAt,
+      venue: result.venue ?? '',
+      submission:
+        result.namingPattern || result.allowedExtensions.length > 0 || result.channel
+          ? {
+              namingPattern: result.namingPattern,
+              allowedExtensions: result.allowedExtensions,
+              channel: result.channel,
+            }
+          : null,
+    }));
+    setDetected(
+      new Set(
+        [
+          'type',
+          'title',
+          'body',
+          result.courseId && 'courseId',
+          result.when && 'dueAt',
+          result.venue && 'venue',
+          result.taskType && 'taskType',
+        ].filter((field): field is string => Boolean(field)),
+      ),
+    );
+  };
 
   const errors: FormError[] = [];
   const required = t('announcements.composer.required');
@@ -260,6 +334,19 @@ export function AnnouncementComposer({
             </Field>
           )}
 
+          {!editing && (
+            <PastePanel
+              courses={courses.data ?? []}
+              timeZone={timeZone}
+              display={{
+                language: i18n.language,
+                timeZone: user.preferences.timeZone,
+                timeFormat: user.preferences.timeFormat,
+              }}
+              onFill={applyPaste}
+            />
+          )}
+
           {editing ? (
             <p className="text-muted">
               {t('announcements.composer.typeFixed', {
@@ -320,7 +407,11 @@ export function AnnouncementComposer({
             </fieldset>
           )}
 
-          <Field id="announcement-course" label={t('announcements.composer.course')}>
+          <Field
+            id="announcement-course"
+            label={t('announcements.composer.course')}
+            hint={checkHint('courseId')}
+          >
             <Select
               value={draft.courseId}
               onChange={(event) => set({ courseId: event.target.value })}
@@ -337,7 +428,7 @@ export function AnnouncementComposer({
           <Field
             id="announcement-title"
             label={t('announcements.composer.title')}
-            hint={t('announcements.composer.titleHint')}
+            hint={checkHint('title', t('announcements.composer.titleHint'))}
             error={errorFor('announcement-title')}
             required
           >
@@ -351,7 +442,11 @@ export function AnnouncementComposer({
 
           {needsDue(draft.type) && (
             <>
-              <Field id="announcement-task-type" label={t('announcements.composer.taskType')}>
+              <Field
+                id="announcement-task-type"
+                label={t('announcements.composer.taskType')}
+                hint={checkHint('taskType')}
+              >
                 <Select
                   value={draft.taskType}
                   onChange={(event) => set({ taskType: event.target.value as TaskType })}
@@ -369,9 +464,10 @@ export function AnnouncementComposer({
                     ? t('announcements.composer.dueAt')
                     : t('announcements.composer.startsAt')
                 }
-                hint={t('announcements.composer.inClassTime', {
-                  zone: timeZone.replaceAll('_', ' '),
-                })}
+                hint={checkHint(
+                  'dueAt',
+                  t('announcements.composer.inClassTime', { zone: timeZone.replaceAll('_', ' ') }),
+                )}
                 error={errorFor('announcement-due')}
                 value={draft.dueAt}
                 onChange={(dueAt) => set({ dueAt })}
@@ -386,9 +482,10 @@ export function AnnouncementComposer({
           {needsStart(draft.type) && (
             <DateTimeField
               label={t('announcements.composer.startsAt')}
-              hint={t('announcements.composer.inClassTime', {
-                zone: timeZone.replaceAll('_', ' '),
-              })}
+              hint={checkHint(
+                'dueAt',
+                t('announcements.composer.inClassTime', { zone: timeZone.replaceAll('_', ' ') }),
+              )}
               error={errorFor('announcement-starts')}
               value={draft.startsAt}
               onChange={(startsAt) => set({ startsAt })}
@@ -402,7 +499,7 @@ export function AnnouncementComposer({
             <Field
               id="announcement-venue"
               label={t('announcements.composer.venue')}
-              hint={t('announcements.composer.venueHint')}
+              hint={checkHint('venue', t('announcements.composer.venueHint'))}
               error={errorFor('announcement-venue')}
               required={draft.type === 'venue_change'}
               optional={draft.type === 'assessment'}
@@ -416,10 +513,59 @@ export function AnnouncementComposer({
             </Field>
           )}
 
+          {draft.type === 'deadline' && draft.submission && (
+            <section
+              aria-labelledby="announcement-rule"
+              className="flex flex-col gap-2 rounded-lg border-default border-border p-4"
+            >
+              <h3 id="announcement-rule" className="font-semibold text-text">
+                {t('announcements.paste.rule.title')}
+              </h3>
+              <ul className="flex flex-col gap-1 text-text">
+                {draft.submission.namingPattern && (
+                  <li>
+                    {t('announcements.paste.rule.name')}{' '}
+                    <code dir="ltr" className="rounded-sm bg-surface-sunken px-1 font-mono">
+                      {draft.submission.namingPattern}
+                      {draft.submission.allowedExtensions[0]
+                        ? `.${draft.submission.allowedExtensions[0]}`
+                        : ''}
+                    </code>
+                  </li>
+                )}
+                {draft.submission.allowedExtensions.length > 0 && (
+                  <li>
+                    {t('announcements.paste.rule.types', {
+                      types: draft.submission.allowedExtensions
+                        .map((extension) => extension.toUpperCase())
+                        .join(', '),
+                    })}
+                  </li>
+                )}
+                {draft.submission.channel && (
+                  <li>
+                    {t('announcements.paste.rule.channel', {
+                      channel: t(`announcements.paste.rule.channels.${draft.submission.channel}`),
+                    })}
+                  </li>
+                )}
+              </ul>
+              <p className="text-sm text-muted">{t('announcements.paste.rule.hint')}</p>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="self-start"
+                onClick={() => set({ submission: null })}
+              >
+                {t('announcements.paste.rule.remove')}
+              </Button>
+            </section>
+          )}
+
           <Field
             id="announcement-body"
             label={t('announcements.composer.body')}
-            hint={t('announcements.composer.bodyHint')}
+            hint={checkHint('body', t('announcements.composer.bodyHint'))}
             optional
           >
             <Textarea
