@@ -13,6 +13,7 @@ export * from './schemas/task.js';
 export * from './schemas/user.js';
 
 // Domain logic
+export * from './domain/announcements.js';
 export * from './domain/join-code.js';
 export * from './domain/permissions.js';
 export * from './domain/preferences.js';

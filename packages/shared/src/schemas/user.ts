@@ -23,6 +23,7 @@ export const quietHoursSchema = z.object({
   start: timeOfDaySchema.default('22:00'),
   end: timeOfDaySchema.default('07:00'),
 });
+export type QuietHours = z.infer<typeof quietHoursSchema>;
 
 /**
  * Quiet-hours fields for partial updates. Deliberately has no defaults: a default here would
