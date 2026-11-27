@@ -181,7 +181,7 @@ For the product itself, see the [vision](vision.md).
 - Today screen (overdue, due today, next seven days, today's classes and venues); timeline in list, week and month views; filters; mark as done with undo; personal tasks; countdowns; empty states that teach; offline copy.
 - **Done when:** the "find my next deadline" target from M09 is met; works offline after first load.
 
-### M22 · Submission Checker
+### M22 · Submission Checker ✅
 
 - Instructors attach rules to any task (naming pattern built from tokens with live preview, allowed types, maximum size, submission channel, late policy); students drop a file onto the task; checks run entirely in the browser; results show a checklist with exact fixes, the corrected file name with a copy button, and where to submit.
 - **Done when:** every rule violation in the test suite is caught, with zero false alarms on correct files.

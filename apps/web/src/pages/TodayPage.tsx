@@ -1,5 +1,12 @@
 import { addDays, type AgendaTask, groupByUrgency } from '@sabaq/shared';
-import { CalendarCheck, CalendarClock, CalendarRange, Plus, Sparkles } from 'lucide-react';
+import {
+  CalendarCheck,
+  CalendarClock,
+  CalendarRange,
+  FileCheck,
+  Plus,
+  Sparkles,
+} from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
@@ -113,6 +120,17 @@ function NextDeadline({
         {task.course && <CourseTag code={task.course.code} color={task.course.color} />}
         {task.className && <span className="text-muted">{task.className}</span>}
       </p>
+      <Link
+        to={`/tasks/${task.id}`}
+        className={buttonVariants({
+          variant: task.submissionRule ? 'primary' : 'secondary',
+          size: 'sm',
+          className: 'self-start',
+        })}
+      >
+        {task.submissionRule ? <FileCheck aria-hidden="true" /> : null}
+        {task.submissionRule ? t('task.checkFile') : t('task.details')}
+      </Link>
     </Card>
   );
 }

@@ -450,10 +450,18 @@ describe('paste a message', () => {
     expect(within(sheet).getByLabelText(/^Title/)).toHaveAccessibleDescription(
       /Filled in from the message; check it\./,
     );
-    expect(within(sheet).getByText('Lab11_{STUDENT_ID}_{SECTION}.pdf')).toBeInTheDocument();
-    expect(
-      within(sheet).getByText('Where to submit: the learning management system'),
-    ).toBeInTheDocument();
+    const rules = within(sheet).getByRole('switch', { name: 'Add submission rules' });
+    expect(rules).toBeChecked();
+    expect(rules).toHaveAccessibleDescription('Filled in from the pasted message. Check it.');
+    expect(within(sheet).getByLabelText(/^File name rule/)).toHaveValue(
+      'Lab11_{STUDENT_ID}_{SECTION}',
+    );
+    expect(within(sheet).getByText('Lab11_70012345_5A.pdf')).toBeInTheDocument();
+    expect(within(sheet).getByRole('button', { name: 'pdf' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(within(sheet).getByLabelText('Where to submit')).toHaveValue('lms');
 
     // Changing a field removes its "filled in" note.
     await user.type(within(sheet).getByLabelText(/^Title/), ' (draft)');
@@ -492,8 +500,8 @@ describe('paste a message', () => {
     await user.type(within(sheet).getByLabelText('Message'), 'Submit report as Report_RollNo');
     await user.click(within(sheet).getByRole('button', { name: 'Fill in again' }));
     expect(within(sheet).getByText('No date was found. Add it below.')).toBeInTheDocument();
-    await user.click(within(sheet).getByRole('button', { name: 'Remove file rules' }));
-    expect(within(sheet).queryByText('File rules from the message')).not.toBeInTheDocument();
+    await user.click(within(sheet).getByRole('switch', { name: 'Add submission rules' }));
+    expect(within(sheet).queryByLabelText(/^File name rule/)).not.toBeInTheDocument();
     expect(await accessibilityViolations()).toEqual([]);
   });
 });

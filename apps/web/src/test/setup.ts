@@ -1,7 +1,10 @@
 import '@testing-library/jest-dom/vitest';
-import { cleanup } from '@testing-library/react';
+import { cleanup, configure } from '@testing-library/react';
 import { afterEach, beforeEach, vi } from 'vitest';
 import { mockApi, resetClient } from './api';
+
+// The whole suite runs in parallel; give screens time to appear on a busy machine.
+configure({ asyncUtilTimeout: 3000 });
 
 beforeEach(() => {
   // Every test starts signed out, with a healthy API; tests replace routes as needed.

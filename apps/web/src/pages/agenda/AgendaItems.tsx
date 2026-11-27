@@ -1,5 +1,5 @@
 import type { AgendaSession, AgendaTask } from '@sabaq/shared';
-import { ExternalLink, MapPin, MoreVertical, Pencil, Trash2 } from 'lucide-react';
+import { ChevronRight, FileCheck, MapPin, MoreVertical, Pencil, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { toast } from 'sonner';
@@ -61,7 +61,8 @@ export const clockTime = (iso: string, display: DisplaySettings) =>
 
 /**
  * One task: a checkbox to mark it done, when it is due with a live countdown, and its course
- * and class. Personal tasks can be edited and deleted; class tasks link to their announcement.
+ * and class. Every task opens its own page (details, submission rules and the file checker);
+ * personal tasks can also be edited and deleted from here.
  */
 export function TaskItem({
   task,
@@ -119,11 +120,17 @@ export function TaskItem({
             {task.course && <CourseTag code={task.course.code} color={task.course.color} />}
             <span>{t(`announcements.taskTypes.${task.type}`)}</span>
             {task.className ? <span>{task.className}</span> : <span>{t('agenda.personal')}</span>}
+            {task.submissionRule && (
+              <span className="inline-flex items-center gap-1">
+                <FileCheck aria-hidden="true" className="size-4" />
+                {t('task.hasRules')}
+              </span>
+            )}
           </span>
         }
       />
       {overdue && <Badge tone="danger">{t('agenda.overdue')}</Badge>}
-      {task.canManage && onEdit && onDelete ? (
+      {task.canManage && onEdit && onDelete && (
         <Menu>
           <MenuTrigger asChild>
             <IconButton
@@ -142,18 +149,14 @@ export function TaskItem({
             </MenuItem>
           </MenuContent>
         </Menu>
-      ) : (
-        task.announcementId &&
-        task.classId && (
-          <Link
-            to={`/classes/${task.classId}?tab=announcements&announcement=${task.announcementId}`}
-            aria-label={t('agenda.openAnnouncement', { title: task.title })}
-            className="inline-flex size-9 shrink-0 items-center justify-center rounded-md text-muted hover:bg-surface-sunken hover:text-text"
-          >
-            <ExternalLink aria-hidden="true" className="size-4" />
-          </Link>
-        )
       )}
+      <Link
+        to={`/tasks/${task.id}`}
+        aria-label={t('task.open', { title: task.title })}
+        className="inline-flex size-9 shrink-0 items-center justify-center rounded-md text-muted hover:bg-surface-sunken hover:text-text"
+      >
+        <ChevronRight aria-hidden="true" className="size-5 rtl:rotate-180" />
+      </Link>
     </div>
   );
 }

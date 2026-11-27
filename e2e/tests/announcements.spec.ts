@@ -99,7 +99,11 @@ test('a class representative turns a pasted chat message into an announcement', 
   // Everything found is highlighted and listed for checking; nothing is posted yet.
   await expect(composer.getByText('Type: Deadline')).toBeVisible();
   await expect(composer.getByLabel(/^Title/)).toHaveValue(new RegExp(`Lab ${number} report$`));
-  await expect(composer.getByText(`Lab${number}_{STUDENT_ID}_{SECTION}.pdf`)).toBeVisible();
+  await expect(composer.getByRole('switch', { name: 'Add submission rules' })).toBeChecked();
+  await expect(composer.getByLabel(/^File name rule/)).toHaveValue(
+    `Lab${number}_{STUDENT_ID}_{SECTION}`,
+  );
+  await expect(composer.getByText(`Lab${number}_70012345_5A.pdf`)).toBeVisible();
   await expectNoViolations(page);
 
   await composer.getByRole('button', { name: 'Post announcement' }).click();

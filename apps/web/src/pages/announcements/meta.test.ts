@@ -56,7 +56,7 @@ describe('composer requests', () => {
     taskType: 'quiz' as const,
     links: [{ label: ' Slides ', url: ' https://example.com/s.pdf ' }],
     pinned: true,
-    submission: null,
+    rule: null,
   };
 
   it('sends only the fields each type has', () => {

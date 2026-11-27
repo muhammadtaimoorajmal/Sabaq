@@ -5,7 +5,6 @@ import {
   type ClassForMember,
   createAnnouncementInputSchema,
   type PastedAnnouncement,
-  type SubmissionChannelKind,
   type TaskType,
   type UpdateAnnouncementInput,
   webUrlSchema,
@@ -37,6 +36,14 @@ import { errorKey } from '../../i18n';
 import { cn } from '../../lib/cn';
 import { AnnouncementCard } from './AnnouncementCard';
 import { PastePanel } from './PastePanel';
+import {
+  draftFromRule,
+  EMPTY_RULE_DRAFT,
+  parseRuleDraft,
+  type RuleDraft,
+} from '../tasks/rule-draft';
+import { RuleFields } from '../tasks/RuleFields';
+import { useRuleErrors } from '../tasks/RuleSheet';
 import { TYPE_META } from './meta';
 
 const DEADLINE_TASKS: TaskType[] = ['assignment', 'lab', 'project', 'reading', 'other'];
@@ -54,14 +61,8 @@ interface Draft {
   taskType: TaskType;
   links: { label: string; url: string }[];
   pinned: boolean;
-  /** File rules read from a pasted message (deadlines only). */
-  submission: PastedRule | null;
-}
-
-interface PastedRule {
-  namingPattern: string | null;
-  allowedExtensions: string[];
-  channel: SubmissionChannelKind | null;
+  /** How the work must be submitted (deadlines only); `null` when there are no rules. */
+  rule: RuleDraft | null;
 }
 
 const draftFrom = (classId: string, announcement: AnnouncementForUser | null): Draft => ({
@@ -76,7 +77,7 @@ const draftFrom = (classId: string, announcement: AnnouncementForUser | null): D
   taskType: announcement?.taskType ?? 'assignment',
   links: announcement?.links ?? [],
   pinned: announcement?.pinned ?? false,
-  submission: null,
+  rule: null,
 });
 
 const needsDue = (type: AnnouncementType) => type === 'deadline' || type === 'assessment';
@@ -99,13 +100,7 @@ export function createInput(draft: Draft) {
       ...base,
       dueAt: draft.dueAt,
       taskType: draft.taskType,
-      ...(draft.submission && {
-        submissionRule: {
-          namingPattern: draft.submission.namingPattern,
-          allowedExtensions: draft.submission.allowedExtensions,
-          channel: { kind: draft.submission.channel ?? 'other', label: null, url: null },
-        },
-      }),
+      ...(draft.rule && { submissionRule: parseRuleDraft(draft.rule).rule }),
     };
   }
   if (draft.type === 'assessment') {
@@ -182,13 +177,13 @@ export function AnnouncementComposer({
       dueAt: needsDue(result.type) ? result.when : current.dueAt,
       startsAt: needsStart(result.type) ? result.when : current.startsAt,
       venue: result.venue ?? '',
-      submission:
+      rule:
         result.namingPattern || result.allowedExtensions.length > 0 || result.channel
-          ? {
+          ? draftFromRule({
               namingPattern: result.namingPattern,
               allowedExtensions: result.allowedExtensions,
-              channel: result.channel,
-            }
+              channel: { kind: result.channel ?? 'other' },
+            })
           : null,
     }));
     setDetected(
@@ -201,6 +196,7 @@ export function AnnouncementComposer({
           result.when && 'dueAt',
           result.venue && 'venue',
           result.taskType && 'taskType',
+          (result.namingPattern || result.allowedExtensions.length > 0 || result.channel) && 'rule',
         ].filter((field): field is string => Boolean(field)),
       ),
     );
@@ -228,6 +224,10 @@ export function AnnouncementComposer({
       });
     }
   });
+  const ruleIssues =
+    draft.type === 'deadline' && draft.rule && !editing ? parseRuleDraft(draft.rule).issues : [];
+  const ruleErrors = useRuleErrors(ruleIssues, 'announcement-rule');
+  errors.push(...ruleErrors.errors);
   const shown = attempt > 0 ? errors : [];
   const errorFor = (field: string) => shown.find((error) => error.field === field)?.message;
   const failure = mutation.error instanceof ApiRequestError ? mutation.error : null;
@@ -513,53 +513,30 @@ export function AnnouncementComposer({
             </Field>
           )}
 
-          {draft.type === 'deadline' && draft.submission && (
-            <section
-              aria-labelledby="announcement-rule"
-              className="flex flex-col gap-2 rounded-lg border-default border-border p-4"
-            >
-              <h3 id="announcement-rule" className="font-semibold text-text">
-                {t('announcements.paste.rule.title')}
-              </h3>
-              <ul className="flex flex-col gap-1 text-text">
-                {draft.submission.namingPattern && (
-                  <li>
-                    {t('announcements.paste.rule.name')}{' '}
-                    <code dir="ltr" className="rounded-sm bg-surface-sunken px-1 font-mono">
-                      {draft.submission.namingPattern}
-                      {draft.submission.allowedExtensions[0]
-                        ? `.${draft.submission.allowedExtensions[0]}`
-                        : ''}
-                    </code>
-                  </li>
-                )}
-                {draft.submission.allowedExtensions.length > 0 && (
-                  <li>
-                    {t('announcements.paste.rule.types', {
-                      types: draft.submission.allowedExtensions
-                        .map((extension) => extension.toUpperCase())
-                        .join(', '),
-                    })}
-                  </li>
-                )}
-                {draft.submission.channel && (
-                  <li>
-                    {t('announcements.paste.rule.channel', {
-                      channel: t(`announcements.paste.rule.channels.${draft.submission.channel}`),
-                    })}
-                  </li>
-                )}
-              </ul>
-              <p className="text-sm text-muted">{t('announcements.paste.rule.hint')}</p>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="self-start"
-                onClick={() => set({ submission: null })}
-              >
-                {t('announcements.paste.rule.remove')}
-              </Button>
-            </section>
+          {draft.type === 'deadline' && !editing && (
+            <div className="flex flex-col gap-4 rounded-lg border-default border-border p-4">
+              <Switch
+                id="announcement-rule"
+                checked={draft.rule !== null}
+                onCheckedChange={(on) => set({ rule: on ? EMPTY_RULE_DRAFT : null })}
+                label={t('submission.editor.add')}
+                description={
+                  detected.has('rule')
+                    ? t('submission.editor.fromMessage')
+                    : t('submission.editor.addHint')
+                }
+              />
+              {draft.rule && (
+                <RuleFields
+                  idPrefix="announcement-rule"
+                  draft={draft.rule}
+                  onChange={(change) =>
+                    set({ rule: { ...(draft.rule ?? EMPTY_RULE_DRAFT), ...change } })
+                  }
+                  errorFor={(field) => (attempt > 0 ? ruleErrors.errorFor(field) : undefined)}
+                />
+              )}
+            </div>
           )}
 
           <Field

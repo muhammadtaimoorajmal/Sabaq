@@ -52,6 +52,17 @@ Open <http://localhost:5173> and sign in with the demo student `zara.ahmed@north
 | Choose a new password | `/reset-password#token=…` | Strength meter; clear next steps for expired or incomplete links |
 | Change password | Settings | Needs the current password; signs out other devices |
 
+## Submission Checker
+
+| Screen | Path | Highlights |
+| --- | --- | --- |
+| Task | `/tasks/:id` | When it is due, details, mark as done, and **Submit it right**: the student's exact file name with a Copy button, accepted types, size limit, where to submit and the late policy; a drop zone (or "Choose a file") that checks a file before it is submitted |
+
+- **Nothing is uploaded.** Only the file's name, size and first 64 KB are read, in the browser; the checker works offline.
+- **Results lead with problems**, each with its fix: the corrected name to copy, "export it as PDF" instead of renaming, compressing an oversized file, or asking the class representative for details the class has not set. Focus moves to the verdict so screen readers announce it.
+- **Renamed files are caught:** a Word document renamed to `.pdf` is reported as a Word document.
+- **Rules editor** (instructors and class representatives; also in the announcement composer for deadlines): a file-name pattern built with detail buttons and a live example, one-tap file types, size limit, where to submit with a link, late policy with grace period and penalty. Removing rules offers Undo.
+
 ## Today and Timeline
 
 | Screen | Path | Highlights |

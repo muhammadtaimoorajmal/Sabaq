@@ -34,7 +34,9 @@ const task = (overrides: Partial<AgendaTask>): AgendaTask => ({
   completedAt: null,
   course: COURSE,
   className: 'BS Computer Science',
+  classSection: '5A',
   canManage: false,
+  canEditRule: false,
   ...overrides,
 });
 
