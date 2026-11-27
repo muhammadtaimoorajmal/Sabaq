@@ -29,7 +29,8 @@ Everything here is **pure**: no network, no database, no browser APIs. Domain lo
 
 | Module | What it does |
 | --- | --- |
-| `submission` | **Submission Checker**: compares a file's name, extension, size and timing with a task's rules and returns the exact file name to use |
+| `submission` | **Submission Checker**: compares a file's name, extension, real content, size and timing with a task's rules, explains why a name is wrong (spaces, separators, a doubled extension, a "(1)" copy suffix) and returns the exact file name to use; fills the student's details into a naming pattern and reads the task number from its title |
+| `file-kind` | Recognizes what a file really is from its first bytes (PDF, Word, Excel, PowerPoint, OpenDocument, ZIP, older Office, images, archives, plain text), so a renamed file is caught |
 | `workload` | Daily workload per calendar day, load levels, and **deadline-clash assessment** with lighter-day suggestions |
 | `urgency` | Overdue / today / tomorrow / next 7 days / later, judged in the class's time zone |
 | `time` | Time-zone-correct calendar-day arithmetic, and the instant of a wall-clock time in a time zone (such as 23:59 class time), including daylight-saving transitions |

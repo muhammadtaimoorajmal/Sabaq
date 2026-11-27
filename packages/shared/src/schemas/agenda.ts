@@ -38,8 +38,15 @@ export const agendaTaskSchema = taskForUserSchema.extend({
   course: courseSummarySchema.nullable(),
   /** The class's name for class tasks; `null` for personal tasks. */
   className: z.string().nullable(),
+  /** The class's section (for file-naming rules); `null` for personal tasks or no section. */
+  classSection: z.string().nullable(),
   /** Personal tasks, and class tasks the person may edit (not those owned by an announcement). */
   canManage: z.boolean(),
+  /**
+   * Whether the person may set the task's submission rules: the owner of a personal task, or an
+   * instructor or class representative for class tasks (including those from announcements).
+   */
+  canEditRule: z.boolean(),
 });
 export type AgendaTask = z.infer<typeof agendaTaskSchema>;
 

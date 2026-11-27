@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
   checkSubmission,
+  namingValues,
+  SAMPLE_NAMING_VALUES,
+  taskNumberFromTitle,
   fillNamingPattern,
   normalizeExtension,
   parseNamingPattern,
@@ -45,6 +48,7 @@ describe('checkSubmission: the happy path', () => {
     expect(result.checks.map(({ id, status, code }) => ({ id, status, code }))).toEqual([
       { id: 'name', status: 'pass', code: 'name.ok' },
       { id: 'extension', status: 'pass', code: 'extension.ok' },
+      { id: 'content', status: 'skipped', code: 'content.not_read' },
       { id: 'size', status: 'pass', code: 'size.ok' },
       { id: 'deadline', status: 'pass', code: 'deadline.on_time' },
       { id: 'channel', status: 'info', code: 'channel.lms' },
@@ -71,10 +75,10 @@ describe('checkSubmission: the happy path', () => {
 });
 
 describe('checkSubmission: file names', () => {
-  it('warns about capitalization when the rule is not case-sensitive', () => {
+  it('notes, but accepts, capitalization when the rule is not case-sensitive', () => {
     const result = run({ name: 'lab11_12345_cs5-1.pdf' });
-    expect(byId(result, 'name')).toMatchObject({ status: 'warn', code: 'name.case_mismatch' });
-    expect(result.verdict).toBe('review');
+    expect(byId(result, 'name')).toMatchObject({ status: 'info', code: 'name.case_mismatch' });
+    expect(result.verdict).toBe('ready');
   });
 
   it('fails capitalization differences when the rule is case-sensitive', () => {
@@ -319,5 +323,77 @@ describe('helpers', () => {
     ['docs/archive.TAR.GZ', ['tar.gz'], { base: 'archive', extension: 'tar.gz' }],
   ])('splits %j', (name, known, expected) => {
     expect(splitFileName(name, known)).toEqual(expected);
+  });
+});
+
+describe('checkSubmission: content', () => {
+  it('skips the content check for empty files and unknown extensions', () => {
+    expect(byId(run(), 'content')?.code).toBe('content.not_read');
+    const kinds = (name: string, kind: 'empty' | 'pdf') =>
+      checkSubmission({
+        file: { name, size: 10, kind },
+        rule: { ...RULE, allowedExtensions: [] },
+        dueAt: null,
+        now: new Date(),
+        values: {},
+      }).checks.find((item) => item.id === 'content');
+    expect(kinds('a.pdf', 'empty')?.code).toBe('content.empty');
+    expect(kinds('movie.mp4', 'pdf')).toMatchObject({
+      status: 'skipped',
+      code: 'content.unknown_type',
+      params: { extension: 'mp4' },
+    });
+    expect(kinds('noextension', 'pdf')?.code).toBe('content.unknown_type');
+    expect(kinds('a.pdf', 'pdf')).toMatchObject({ status: 'pass', code: 'content.ok' });
+  });
+});
+
+describe('naming values', () => {
+  it.each([
+    ['Lab 10: Normalization', '10'],
+    ['Lab10', '10'],
+    ['Assignment #3', '3'],
+    ['Assignment No. 2 – essay', '2'],
+    ['Week 11 lab 4', '4'],
+    ['Quiz 2 (due 11:59 PM)', '2'],
+    ['Homework 7 due 25/11', '7'],
+    ['Reading 5', '5'],
+    ['Final project', null],
+    ['Due at 11:59', null],
+  ])('reads the task number from %j', (title, number) => {
+    expect(taskNumberFromTitle(title)).toBe(number);
+  });
+
+  it('fills every token from the person, class, course and task, without spaces', () => {
+    expect(
+      namingValues({
+        studentId: ' 70012345 ',
+        name: 'Ayesha  Khan',
+        section: '5 A',
+        courseCode: 'CS 301',
+        title: 'Lab 3',
+      }),
+    ).toEqual({
+      STUDENT_ID: '70012345',
+      STUDENT_NAME: 'AyeshaKhan',
+      SECTION: '5A',
+      COURSE_CODE: 'CS301',
+      TASK_NO: '3',
+    });
+    expect(
+      namingValues({ studentId: null, name: '', section: null, courseCode: null, title: 'x' }),
+    ).toEqual({
+      STUDENT_ID: null,
+      STUDENT_NAME: null,
+      SECTION: null,
+      COURSE_CODE: null,
+      TASK_NO: null,
+    });
+  });
+
+  it('has a sample value for every token, for previews', () => {
+    const parsed = parseNamingPattern('{STUDENT_ID}{STUDENT_NAME}{SECTION}{COURSE_CODE}{TASK_NO}');
+    if (!parsed.ok) throw new Error('pattern should parse');
+    expect(fillNamingPattern(parsed.segments, SAMPLE_NAMING_VALUES).missing).toEqual([]);
   });
 });

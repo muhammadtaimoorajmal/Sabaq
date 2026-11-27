@@ -5,6 +5,7 @@
  * Every result is a machine-readable `code` with `params`, never an English sentence,
  * so the interface can present it in any language.
  */
+import { expectedKinds, type FileKind, usualExtension } from './file-kind.js';
 
 /** Placeholders an instructor can use in a file-naming pattern, e.g. `Lab{TASK_NO}_{STUDENT_ID}`. */
 export const NAMING_TOKENS = [
@@ -73,6 +74,49 @@ export function parseNamingPattern(pattern: string): PatternParseResult {
   }
   if (literal) segments.push({ kind: 'literal', value: literal });
   return { ok: true, segments };
+}
+
+/** Example values for previewing a pattern while it is being written. */
+export const SAMPLE_NAMING_VALUES: Record<NamingToken, string> = {
+  STUDENT_ID: '70012345',
+  STUDENT_NAME: 'AyeshaKhan',
+  SECTION: '5A',
+  COURSE_CODE: 'CS301',
+  TASK_NO: '3',
+};
+
+/**
+ * The task's number from its title: "Lab 10: Normalization" gives `10`, "Assignment #3" gives
+ * `3`. A number after a task word wins over other numbers ("Week 11 lab 4" gives `4`).
+ */
+export function taskNumberFromTitle(title: string): string | null {
+  const keyed =
+    /\b(?:lab|assignment|assgn|asgn|quiz|project|homework|hw|task|exercise|sheet|tutorial|problem set|ps)\s*(?:no\.?|number|#)?\s*(\d{1,3})(?!\d)/iu.exec(
+      title,
+    );
+  if (keyed) return String(keyed[1]);
+  return /(?:^|[^\d:/.])(\d{1,3})(?![\d:/])/u.exec(title)?.[1] ?? null;
+}
+
+/**
+ * The values a student's file name is checked against. Spaces are removed, since file-naming
+ * rules join their parts without spaces ("Ayesha Khan" becomes `AyeshaKhan`).
+ */
+export function namingValues(input: {
+  studentId: string | null;
+  name: string | null;
+  section: string | null;
+  courseCode: string | null;
+  title: string;
+}): NamingValues {
+  const compact = (value: string | null) => value?.replace(/\s+/gu, '') || null;
+  return {
+    STUDENT_ID: compact(input.studentId),
+    STUDENT_NAME: compact(input.name),
+    SECTION: compact(input.section),
+    COURSE_CODE: compact(input.courseCode),
+    TASK_NO: taskNumberFromTitle(input.title),
+  };
 }
 
 /** Fills a parsed pattern with the student's values. Lists tokens that have no value. */
@@ -159,14 +203,15 @@ export interface SubmissionRuleLike {
 }
 
 export interface SubmissionCheckInput {
-  file: { name: string; size: number };
+  /** `kind` is what the file's first bytes show it really is (see `sniffFileKind`). */
+  file: { name: string; size: number; kind?: FileKind };
   rule: SubmissionRuleLike;
   dueAt: Date | string | null;
   now: Date;
   values: NamingValues;
 }
 
-export type CheckId = 'name' | 'extension' | 'size' | 'deadline' | 'channel';
+export type CheckId = 'name' | 'extension' | 'content' | 'size' | 'deadline' | 'channel';
 export type CheckStatus = 'pass' | 'info' | 'warn' | 'fail' | 'skipped';
 export type CheckParams = Record<string, string | number | null>;
 
@@ -198,12 +243,48 @@ function joinName(base: string, extension: string): string {
   return extension ? `${base}.${extension}` : base;
 }
 
+export type NameHint = 'double_extension' | 'duplicate_suffix' | 'whitespace' | 'separators';
+
+/** What a browser or file manager adds to a second copy: " (1)", " - Copy", "_copy". */
+const COPY_SUFFIX = /(?:\s*\(\d+\)|\s*-\s*copy(?:\s*\(\d+\))?|[\s_]copy(?:\s*\(\d+\))?)$/iu;
+
 /** Explains *why* two names differ, so the fix is obvious. */
-function mismatchHint(expected: string, actual: string): 'whitespace' | 'separators' | null {
+function mismatchHint(expected: string, actual: string): NameHint | null {
+  const lowerExpected = expected.toLowerCase();
+  const lowerActual = actual.toLowerCase();
+  const inner = /\.([a-z\d]{1,5})$/iu.exec(actual);
+  if (
+    inner &&
+    expectedKinds(normalizeExtension(String(inner[1]))) &&
+    lowerActual.slice(0, inner.index) === lowerExpected
+  ) {
+    return 'double_extension';
+  }
+  if (COPY_SUFFIX.test(actual) && lowerActual.replace(COPY_SUFFIX, '') === lowerExpected) {
+    return 'duplicate_suffix';
+  }
   const compact = (text: string) => text.toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
   if (/\s/.test(actual) && !/\s/.test(expected)) return 'whitespace';
   if (compact(expected) === compact(actual)) return 'separators';
   return null;
+}
+
+/** Compares the file's real format with its extension: renaming never converts a file. */
+function checkContent(extension: string, kind: FileKind | undefined): SubmissionCheck {
+  if (kind === undefined) return check('content', 'skipped', 'content.not_read');
+  if (kind === 'empty') return check('content', 'skipped', 'content.empty');
+  const expected = extension ? expectedKinds(extension) : null;
+  if (!expected) return check('content', 'skipped', 'content.unknown_type', { extension });
+  if (expected.includes(kind)) return check('content', 'pass', 'content.ok', { extension });
+  // Unusual bytes in a text file may still be fine (for example an unusual encoding).
+  if (expected.includes('text') && kind === 'binary') {
+    return check('content', 'warn', 'content.not_text', { extension });
+  }
+  return check('content', 'fail', 'content.mismatch', {
+    extension,
+    actual: kind,
+    suggested: usualExtension(kind),
+  });
 }
 
 function checkExtension(rule: SubmissionRuleLike, extension: string): SubmissionCheck {
@@ -292,7 +373,7 @@ function checkName(
   }
   if (actual.toLowerCase() === expectedNormalized.toLowerCase()) {
     return {
-      result: check('name', rule.caseSensitive ? 'fail' : 'warn', 'name.case_mismatch', {
+      result: check('name', rule.caseSensitive ? 'fail' : 'info', 'name.case_mismatch', {
         expected: expectedNormalized,
         actual,
       }),
@@ -319,6 +400,7 @@ export function checkSubmission(input: SubmissionCheckInput): SubmissionCheckRes
   const checks: SubmissionCheck[] = [
     name.result,
     checkExtension(rule, parts.extension),
+    checkContent(parts.extension, file.kind),
     checkSize(rule, file.size),
     checkDeadline(rule.latePolicy, dueAt, now),
     check('channel', 'info', `channel.${rule.channel.kind}`, {
