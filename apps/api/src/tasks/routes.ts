@@ -1,4 +1,9 @@
-import { agendaQuerySchema, createTaskInputSchema, updateTaskInputSchema } from '@sabaq/shared';
+import {
+  agendaQuerySchema,
+  createTaskInputSchema,
+  submissionRuleSchema,
+  updateTaskInputSchema,
+} from '@sabaq/shared';
 import { type RequestHandler, Router } from 'express';
 import { authOf } from '../auth/middleware.js';
 import { parseInput } from '../lib/validate.js';
@@ -25,6 +30,10 @@ export function tasksRouter({
       .json(await service.create(authOf(res).userId, parseInput(createTaskInputSchema, req.body)));
   });
 
+  router.get('/tasks/:taskId', authenticated, async (req, res) => {
+    res.json(await service.get(authOf(res).userId, req.params.taskId as string));
+  });
+
   router.patch('/tasks/:taskId', authenticated, async (req, res) => {
     res.json(
       await service.update(
@@ -38,6 +47,20 @@ export function tasksRouter({
   router.delete('/tasks/:taskId', authenticated, async (req, res) => {
     await service.remove(authOf(res).userId, req.params.taskId as string);
     res.status(204).end();
+  });
+
+  router.put('/tasks/:taskId/rule', authenticated, async (req, res) => {
+    res.json(
+      await service.setRule(
+        authOf(res).userId,
+        req.params.taskId as string,
+        parseInput(submissionRuleSchema, req.body),
+      ),
+    );
+  });
+
+  router.delete('/tasks/:taskId/rule', authenticated, async (req, res) => {
+    res.json(await service.setRule(authOf(res).userId, req.params.taskId as string, null));
   });
 
   router.put('/tasks/:taskId/completion', authenticated, async (req, res) => {

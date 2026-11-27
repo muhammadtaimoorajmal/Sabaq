@@ -3,6 +3,7 @@ import {
   type Agenda,
   type AgendaQuery,
   type AgendaTask,
+  can,
   canManageItem,
   type CourseSummary,
   type CreateTaskInput,
@@ -26,6 +27,16 @@ import {
 import { AppError } from '../lib/errors.js';
 
 type TaskDocument = HydratedDocument<TaskRecord>;
+
+interface TaskContext {
+  userId: string;
+  completedAt: Date | null;
+  course: CourseSummary | null;
+  className: string | null;
+  classSection: string | null;
+  role: string | null;
+  platformRole: string;
+}
 
 /** Overdue work older than this no longer appears in the agenda. */
 export const OVERDUE_WINDOW_DAYS = 30;
@@ -159,6 +170,7 @@ export class TaskService {
           completedAt: completedAt.get(String(task._id)) ?? null,
           course: summary(task.courseId),
           className: task.classId ? (classOf.get(String(task.classId))?.name ?? null) : null,
+          classSection: task.classId ? (classOf.get(String(task.classId))?.section ?? null) : null,
           role: task.classId ? (roleIn.get(String(task.classId)) ?? null) : null,
           platformRole: user.platformRole,
         }),
@@ -201,9 +213,34 @@ export class TaskService {
       completedAt: null,
       course,
       className: null,
+      classSection: null,
       role: null,
       platformRole: 'user',
     });
+  }
+
+  /** One task the person can see, for its own page. */
+  async get(userId: string, id: string): Promise<AgendaTask> {
+    const task = await this.visible(userId, id);
+    return this.serialize(task, await this.contextFor(userId, task));
+  }
+
+  /**
+   * Sets (or, with `null`, removes) how a task must be submitted. Rules can be set on class tasks
+   * created by announcements too: the announcement keeps its title and time, the task its rules.
+   */
+  async setRule(userId: string, id: string, rule: SubmissionRule | null): Promise<AgendaTask> {
+    const task = await this.visible(userId, id);
+    const context = await this.contextFor(userId, task);
+    if (!this.canEditRule(task, context)) {
+      throw new AppError(
+        'forbidden',
+        'Only instructors and class representatives can set submission rules for class tasks.',
+      );
+    }
+    task.set({ submissionRule: rule });
+    await task.save();
+    return this.serialize(task, context);
   }
 
   async update(userId: string, id: string, input: UpdateTaskInput): Promise<AgendaTask> {
@@ -288,30 +325,7 @@ export class TaskService {
 
   private async manageable(userId: string, id: string) {
     const task = await this.visible(userId, id);
-    const user = await UserModel.findById(userId, { platformRole: 1 });
-    const membership = task.classId
-      ? await MembershipModel.findOne({ classId: task.classId, userId })
-      : null;
-    const context = {
-      userId,
-      completedAt:
-        (await TaskCompletionModel.findOne({ taskId: task._id, userId }))?.completedAt ?? null,
-      course: task.courseId
-        ? await CourseModel.findById(task.courseId).then((course) =>
-            course
-              ? {
-                  id: String(course._id),
-                  code: course.code,
-                  title: course.title,
-                  color: course.color,
-                }
-              : null,
-          )
-        : null,
-      className: task.classId ? ((await ClassModel.findById(task.classId))?.name ?? null) : null,
-      role: membership?.role ?? null,
-      platformRole: user?.platformRole ?? 'user',
-    };
+    const context = await this.contextFor(userId, task);
     if (!this.canManage(task, context)) {
       throw new AppError(
         'forbidden',
@@ -321,6 +335,42 @@ export class TaskService {
       );
     }
     return { task, context };
+  }
+
+  /** Everything about the person and the task's class that the response needs. */
+  private async contextFor(userId: string, task: TaskDocument): Promise<TaskContext> {
+    const [user, membership, completion, course, cls] = await Promise.all([
+      UserModel.findById(userId, { platformRole: 1 }),
+      task.classId ? MembershipModel.findOne({ classId: task.classId, userId }) : null,
+      TaskCompletionModel.findOne({ taskId: task._id, userId }),
+      task.courseId ? CourseModel.findById(task.courseId) : null,
+      task.classId ? ClassModel.findById(task.classId) : null,
+    ]);
+    return {
+      userId,
+      completedAt: completion?.completedAt ?? null,
+      course: course
+        ? { id: String(course._id), code: course.code, title: course.title, color: course.color }
+        : null,
+      className: cls?.name ?? null,
+      classSection: cls?.section ?? null,
+      role: membership?.role ?? null,
+      platformRole: user?.platformRole ?? 'user',
+    };
+  }
+
+  private canEditRule(
+    task: TaskDocument,
+    context: { userId: string; role: string | null; platformRole: string },
+  ): boolean {
+    if (task.ownerId) return String(task.ownerId) === context.userId;
+    return can(
+      {
+        platformRole: context.platformRole as 'user' | 'admin',
+        membershipRole: context.role as 'student' | 'class_rep' | 'instructor' | null,
+      },
+      'task.create_for_class',
+    );
   }
 
   private canManage(
@@ -340,17 +390,7 @@ export class TaskService {
     );
   }
 
-  private serialize(
-    task: TaskDocument,
-    context: {
-      userId: string;
-      completedAt: Date | null;
-      course: CourseSummary | null;
-      className: string | null;
-      role: string | null;
-      platformRole: string;
-    },
-  ): AgendaTask {
+  private serialize(task: TaskDocument, context: TaskContext): AgendaTask {
     return {
       id: String(task._id),
       classId: task.classId ? String(task.classId) : null,
@@ -368,7 +408,9 @@ export class TaskService {
       completedAt: context.completedAt?.toISOString() ?? null,
       course: context.course,
       className: context.className,
+      classSection: context.classSection,
       canManage: this.canManage(task, context),
+      canEditRule: this.canEditRule(task, context),
     };
   }
 }

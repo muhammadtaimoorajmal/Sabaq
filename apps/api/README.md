@@ -97,6 +97,8 @@ Members are notified of new posts and important changes. A notification created 
 | `GET /api/agenda?from=YYYY-MM-DD&to=YYYY-MM-DD` | Tasks and class meetings for up to 62 days, in the person's time zone: class tasks from every class and personal tasks due in the range, plus unfinished work overdue within the last 30 days; each day's meetings with announced cancellations and room changes applied (`status`: `scheduled`, `cancelled` or `moved`, with the usual room) |
 | `POST /api/tasks` | Add a personal task (visible to its owner only; its course must be from one of the person's classes) |
 | `PATCH /api/tasks/:id`, `DELETE /api/tasks/:id` | Change or delete a personal task, or a class task without an announcement (instructors, class representatives). Tasks created by an announcement change with the announcement |
+| `GET /api/tasks/:id` | One task the person can see, with its course, class, class section, submission rules and what the person may do (`canManage`, `canEditRule`) |
+| `PUT /api/tasks/:id/rule`, `DELETE /api/tasks/:id/rule` | Set or remove how the task must be submitted (file-name pattern, file types, size limit, where to submit, late policy): the owner of a personal task, or instructors and class representatives for any class task, including tasks created by announcements |
 | `PUT /api/tasks/:id/completion`, `DELETE /api/tasks/:id/completion` | Mark a task done or not done, for this person only |
 
 ### Your account (`/api/account`)

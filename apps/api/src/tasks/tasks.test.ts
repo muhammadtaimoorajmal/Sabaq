@@ -3,7 +3,7 @@ import type { Express } from 'express';
 import request from 'supertest';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createApp } from '../app.js';
-import { TaskCompletionModel, TaskModel } from '../db/models/index.js';
+import { ClassModel, TaskCompletionModel, TaskModel } from '../db/models/index.js';
 import { useTestDatabase } from '../test/database.js';
 import { MemoryMailer, memoryLogger, testConfig } from '../test/helpers.js';
 
@@ -295,5 +295,109 @@ describe('class tasks', () => {
     await as(rep)
       .delete(`/tasks/${String(plain._id)}`)
       .expect(204);
+  });
+});
+
+describe('one task and its submission rules', () => {
+  const RULE = {
+    namingPattern: 'Lab{TASK_NO}_{STUDENT_ID}_{SECTION}',
+    allowedExtensions: ['.PDF', 'docx', 'pdf'],
+    maxSizeMB: 10,
+    channel: { kind: 'lms', label: 'Week 11 folder' },
+    latePolicy: { kind: 'penalty', graceMinutes: 15, penaltyPercent: 10 },
+  };
+
+  async function labTask() {
+    await ClassModel.updateOne({ _id: classId }, { section: '5A' });
+    const posted = await as(rep)
+      .post(`/classes/${classId}/announcements`, {
+        type: 'deadline',
+        title: 'Lab 11 report',
+        courseId,
+        dueAt: '2026-11-28T18:59:00.000Z',
+        taskType: 'lab',
+      })
+      .expect(201);
+    return String(posted.body.taskId);
+  }
+
+  it('returns one task with its class section and what the person may do', async () => {
+    const id = await labTask();
+    const forZara = agendaTaskSchema.parse((await as(zara).get(`/tasks/${id}`).expect(200)).body);
+    expect(forZara).toMatchObject({
+      title: 'Lab 11 report',
+      className: 'BSCS 5A',
+      classSection: '5A',
+      canManage: false,
+      canEditRule: false,
+      course: { code: 'CS-341' },
+      submissionRule: null,
+    });
+    const forRep = agendaTaskSchema.parse((await as(rep).get(`/tasks/${id}`).expect(200)).body);
+    expect(forRep.canEditRule).toBe(true);
+
+    const agenda = agendaSchema.parse((await as(zara).get(week).expect(200)).body);
+    expect(agenda.tasks[0]).toMatchObject({ classSection: '5A', canEditRule: false });
+
+    const stranger = await person('Someone Else');
+    await as(stranger).get(`/tasks/${id}`).expect(404);
+    await as(zara).get('/tasks/not-an-id').expect(404);
+  });
+
+  it('lets class managers set and remove rules, even on announcement tasks', async () => {
+    const id = await labTask();
+    const set = await request(app)
+      .put(`/api/tasks/${id}/rule`)
+      .set('Authorization', rep.auth)
+      .send(RULE)
+      .expect(200);
+    expect(set.body.submissionRule).toEqual({
+      namingPattern: 'Lab{TASK_NO}_{STUDENT_ID}_{SECTION}',
+      caseSensitive: false,
+      allowedExtensions: ['pdf', 'docx'],
+      maxSizeMB: 10,
+      channel: { kind: 'lms', label: 'Week 11 folder', url: null },
+      latePolicy: { kind: 'penalty', graceMinutes: 15, penaltyPercent: 10 },
+    });
+
+    const seen = await as(zara).get(`/tasks/${id}`).expect(200);
+    expect(seen.body.submissionRule.namingPattern).toBe('Lab{TASK_NO}_{STUDENT_ID}_{SECTION}');
+
+    const cleared = await as(rep).delete(`/tasks/${id}/rule`).expect(200);
+    expect(cleared.body.submissionRule).toBeNull();
+  });
+
+  it('refuses rules from students and broken patterns', async () => {
+    const id = await labTask();
+    const refused = await request(app)
+      .put(`/api/tasks/${id}/rule`)
+      .set('Authorization', zara.auth)
+      .send(RULE)
+      .expect(403);
+    expect(refused.body.error.code).toBe('forbidden');
+    await as(zara).delete(`/tasks/${id}/rule`).expect(403);
+
+    const broken = await request(app)
+      .put(`/api/tasks/${id}/rule`)
+      .set('Authorization', rep.auth)
+      .send({ ...RULE, namingPattern: 'Lab{WEEK}' })
+      .expect(400);
+    expect(broken.body.error.issues[0]).toMatchObject({ path: 'namingPattern' });
+  });
+
+  it('lets people set rules on their own personal tasks only', async () => {
+    const own = await as(zara)
+      .post('/tasks', { title: 'Essay draft', type: 'assignment', dueAt: '2026-11-29T10:00:00Z' })
+      .expect(201);
+    expect(own.body.canEditRule).toBe(true);
+    const updated = await request(app)
+      .put(`/api/tasks/${String(own.body.id)}/rule`)
+      .set('Authorization', zara.auth)
+      .send({ allowedExtensions: ['docx'], channel: { kind: 'other' } })
+      .expect(200);
+    expect(updated.body.submissionRule.allowedExtensions).toEqual(['docx']);
+    await as(rep)
+      .get(`/tasks/${String(own.body.id)}`)
+      .expect(404);
   });
 });
