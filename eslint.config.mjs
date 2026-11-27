@@ -38,6 +38,11 @@ export default tseslint.config(
     },
   },
   {
+    // The offline service worker runs in a worker, not on a page.
+    files: ['apps/web/public/sw.js'],
+    languageOptions: { globals: { ...globals.serviceworker } },
+  },
+  {
     // Accessibility rules for every user interface file
     files: ['**/*.{jsx,tsx}'],
     ...jsxA11y.flatConfigs.strict,

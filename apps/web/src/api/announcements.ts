@@ -112,8 +112,12 @@ export function useMarkSeen() {
   });
 }
 
+/** Announcements can create tasks and change class meetings, so the agenda refreshes too. */
 const refreshAll = (queryClient: QueryClient) =>
-  queryClient.invalidateQueries({ queryKey: announcementKeys.all });
+  Promise.all([
+    queryClient.invalidateQueries({ queryKey: announcementKeys.all }),
+    queryClient.invalidateQueries({ queryKey: ['agenda'] }),
+  ]);
 
 export function useCreateAnnouncement(classId: string) {
   const queryClient = useQueryClient();

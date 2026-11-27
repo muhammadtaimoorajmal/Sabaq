@@ -47,6 +47,14 @@ const DEFAULTS: Handlers = {
   'GET /api/classes': () => json(200, []),
   'GET /api/announcements': () => json(200, { items: [], nextBefore: null }),
   'GET /api/announcements/unread': () => json(200, { total: 0, byClass: {} }),
+  'GET /api/agenda': () =>
+    json(200, {
+      timeZone: 'Asia/Karachi',
+      from: '2026-11-26',
+      to: '2026-12-03',
+      tasks: [],
+      sessions: [],
+    }),
 };
 
 /**

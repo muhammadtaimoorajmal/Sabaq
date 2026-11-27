@@ -52,6 +52,26 @@ Open <http://localhost:5173> and sign in with the demo student `zara.ahmed@north
 | Choose a new password | `/reset-password#token=…` | Strength meter; clear next steps for expired or incomplete links |
 | Change password | Settings | Needs the current password; signs out other devices |
 
+## Today and Timeline
+
+| Screen | Path | Highlights |
+| --- | --- | --- |
+| Today | `/` | The next deadline first, with a live countdown; then overdue work, what is due today, today's classes (cancelled and moved classes marked, with the usual room), tomorrow and the rest of the week. On phones today's classes follow what is due today; on wide screens they sit beside it |
+| Timeline | `/timeline` | List (30 days), week and month views; class, course and kind filters (folded behind a button on phones); "Show done"; previous, today and next. The view, day and filters are in the address. The month grid works with arrow keys |
+
+- **Tick it off, undo it.** Marking a task done changes the screen at once and offers Undo; if the server refuses (for example offline), the change is put back with an explanation.
+- **Personal tasks** sit beside class work: add, edit and delete them from Today or the timeline.
+- **Countdowns** ("in 5 hours", "yesterday") refresh every minute while the page is open.
+
+### Working offline
+
+After the first visit, Sabaq opens without a connection:
+
+- A service worker (`public/sw.js`) keeps every file of the build, listed at build time in `precache.json`. Pages come from the network first and from the saved copy offline; API requests are never cached by the worker.
+- The agenda, classes and announcements are kept on the device (at most 7 days old) and shown while offline, with the "You are offline" banner. Changes need a connection and say so.
+- If the device is offline at start-up, the app opens with the last signed-in person; the real session is restored as soon as the connection returns.
+- Signing out, or a session ending, removes everything kept for offline use.
+
 ## Announcements
 
 | Screen | Path | Highlights |

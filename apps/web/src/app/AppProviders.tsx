@@ -1,5 +1,9 @@
 import { type Preferences, RTL_LANGUAGES } from '@sabaq/shared';
 import { type QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+  type PersistQueryClientOptions,
+  PersistQueryClientProvider,
+} from '@tanstack/react-query-persist-client';
 import type { i18n } from 'i18next';
 import { Direction } from 'radix-ui';
 import { type ReactNode, useState } from 'react';
@@ -29,29 +33,39 @@ export function AppProviders({
   i18n,
   preferences,
   queryClient,
+  persist,
   children,
 }: {
   i18n: i18n;
   preferences?: Preferences;
   queryClient?: QueryClient;
+  /** Keeps server answers on this device for offline use (the real app only, never tests). */
+  persist?: Omit<PersistQueryClientOptions, 'queryClient'>;
   children: ReactNode;
 }) {
   const [client] = useState(() => queryClient ?? createQueryClient());
+  const session = (
+    <ConnectionProvider>
+      <AuthProvider>
+        <PreferencesSync />
+        <TooltipProvider>
+          {children}
+          <Toaster />
+        </TooltipProvider>
+      </AuthProvider>
+    </ConnectionProvider>
+  );
   return (
     <I18nextProvider i18n={i18n}>
       <PreferencesProvider initial={preferences}>
         <ReadingDirection>
-          <QueryClientProvider client={client}>
-            <ConnectionProvider>
-              <AuthProvider>
-                <PreferencesSync />
-                <TooltipProvider>
-                  {children}
-                  <Toaster />
-                </TooltipProvider>
-              </AuthProvider>
-            </ConnectionProvider>
-          </QueryClientProvider>
+          {persist ? (
+            <PersistQueryClientProvider client={client} persistOptions={persist}>
+              {session}
+            </PersistQueryClientProvider>
+          ) : (
+            <QueryClientProvider client={client}>{session}</QueryClientProvider>
+          )}
         </ReadingDirection>
       </PreferencesProvider>
     </I18nextProvider>

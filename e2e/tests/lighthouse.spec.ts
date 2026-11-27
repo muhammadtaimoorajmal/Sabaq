@@ -35,6 +35,7 @@ test.describe('Lighthouse', () => {
         ['/settings', true],
         ['/welcome', true],
         ['/inbox', true],
+        ['/timeline', true],
         ['/design-system', false],
       ] as const) {
         const result = await lighthouse(`${WEB_URL}${path}`, {

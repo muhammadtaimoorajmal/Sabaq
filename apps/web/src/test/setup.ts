@@ -48,3 +48,4 @@ globalThis.ResizeObserver ??= ResizeObserverStandIn as unknown as typeof ResizeO
 Element.prototype.scrollIntoView ??= vi.fn();
 Element.prototype.hasPointerCapture ??= () => false;
 Element.prototype.releasePointerCapture ??= vi.fn();
+Element.prototype.setPointerCapture ??= vi.fn();

@@ -8,7 +8,7 @@ An open-source academic companion that brings every deadline, announcement and s
 
 [![CI](https://github.com/muhammadtaimoorajmal/Sabaq/actions/workflows/ci.yml/badge.svg)](https://github.com/muhammadtaimoorajmal/Sabaq/actions/workflows/ci.yml)
 [![Status](https://img.shields.io/badge/status-in%20development-orange)](docs/roadmap.md)
-[![Roadmap](https://img.shields.io/badge/roadmap-14%20of%2030%20milestones-blue)](#roadmap)
+[![Roadmap](https://img.shields.io/badge/roadmap-15%20of%2030%20milestones-blue)](#roadmap)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 [Vision](docs/vision.md) · [Roadmap](docs/roadmap.md) · [Documentation](docs/README.md) · [Contributing](CONTRIBUTING.md)
@@ -130,7 +130,7 @@ npm run check      # everything CI runs: format, lint, docs, types, tests
 | `npm run build` | Builds every workspace package |
 | `npm run research:survey` | Validates the survey export and writes the analysis with charts and hypothesis verdicts |
 
-The API, its database and authentication are in place ([`apps/api`](apps/api/README.md), [data model](docs/data-model.md)), and so is the web app's [design system](docs/design-system/README.md), app shell and account screens ([`apps/web`](apps/web/README.md)): create an account, confirm the e-mail address, sign in (or use a demo account), recover a forgotten password, change the password and manage signed-in devices; create a class, invite with a code, link or QR code, join in seconds, manage members, roles and courses; a short welcome after sign-up; profile and photo; display, time and notification settings that follow you to every device; download your data or delete your account; structured announcements (deadlines become tasks for the whole class), an inbox with unread counts, edit history and live "seen by" receipts; paste a chat message to draft an announcement, with every detected detail highlighted for checking. No database or e-mail setup is needed for development. Product screens arrive in the next milestones; see the [roadmap](#roadmap).
+The API, its database and authentication are in place ([`apps/api`](apps/api/README.md), [data model](docs/data-model.md)), and so is the web app's [design system](docs/design-system/README.md), app shell and account screens ([`apps/web`](apps/web/README.md)): create an account, confirm the e-mail address, sign in (or use a demo account), recover a forgotten password, change the password and manage signed-in devices; create a class, invite with a code, link or QR code, join in seconds, manage members, roles and courses; a short welcome after sign-up; profile and photo; display, time and notification settings that follow you to every device; download your data or delete your account; structured announcements (deadlines become tasks for the whole class), an inbox with unread counts, edit history and live "seen by" receipts; paste a chat message to draft an announcement, with every detected detail highlighted for checking; Today (next deadline, overdue, due today, today's classes with cancellations and room changes) and a timeline in list, week and month views; personal tasks; mark as done with undo; works offline after the first visit. No database or e-mail setup is needed for development. Product screens arrive in the next milestones; see the [roadmap](#roadmap).
 
 ## Roadmap
 
@@ -170,7 +170,7 @@ Sabaq is built in 30 milestones, each verified before release. Details are in th
 - [x] M18 · Onboarding, profile and personalization
 - [x] M19 · Structured announcements and receipts
 - [x] M20 · Paste-to-structure assistant
-- [ ] M21 · Today and Timeline
+- [x] M21 · Today and Timeline
 - [ ] M22 · Submission Checker
 - [ ] M23 · Workload heatmap and clash warning
 - [ ] M24 · Planner

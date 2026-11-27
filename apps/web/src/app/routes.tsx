@@ -70,6 +70,12 @@ export const routes: RouteObject[] = [
             lazy: () => import('../pages/TodayPage').then((m) => ({ Component: m.TodayPage })),
           },
           {
+            path: 'timeline',
+            handle: handle('timeline.title'),
+            lazy: () =>
+              import('../pages/agenda/TimelinePage').then((m) => ({ Component: m.TimelinePage })),
+          },
+          {
             path: 'inbox',
             handle: handle('announcements.inboxTitle'),
             lazy: () =>

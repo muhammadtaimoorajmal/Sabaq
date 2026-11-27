@@ -1,9 +1,36 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vite';
+import { createHash } from 'node:crypto';
+import { defineConfig, type Plugin } from 'vite';
+
+/** Changes with every build, so the service worker and offline data are replaced together. */
+const BUILD_ID = Date.now().toString(36);
+
+/**
+ * Lists every file of the build in `precache.json`, so the service worker can keep the whole
+ * app (including pages not visited yet) for offline use.
+ */
+function precacheManifest(): Plugin {
+  return {
+    name: 'sabaq-precache-manifest',
+    apply: 'build',
+    generateBundle(_options, bundle) {
+      const files = Object.keys(bundle)
+        .filter((file) => !file.endsWith('.map'))
+        .sort();
+      const version = createHash('sha256').update(files.join(' ')).digest('hex').slice(0, 12);
+      this.emitFile({
+        type: 'asset',
+        fileName: 'precache.json',
+        source: JSON.stringify({ version, files }),
+      });
+    },
+  };
+}
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), precacheManifest()],
+  define: { __BUILD_ID__: JSON.stringify(BUILD_ID) },
   resolve: {
     // Use @sabaq/shared's TypeScript sources directly, so changes apply without a build.
     conditions: ['@sabaq/source', 'module', 'browser', 'development|production'],

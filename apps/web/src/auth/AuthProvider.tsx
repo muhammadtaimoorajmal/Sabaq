@@ -11,11 +11,14 @@ import {
   useState,
 } from 'react';
 import { api, clientState, refreshSession } from '../api/client';
+import { useConnection } from '../api/connection';
+import { clearOfflineData, loadOfflineUser, saveOfflineUser } from '../api/offline';
 
 export type AuthState =
   | { status: 'loading' }
   | { status: 'anonymous'; reason: 'initial' | 'expired' | 'signed-out' }
-  | { status: 'authenticated'; user: User };
+  /** `offline`: opened without a connection, from what this device remembers. */
+  | { status: 'authenticated'; user: User; offline?: boolean };
 
 interface AuthValue {
   state: AuthState;
@@ -38,14 +41,18 @@ const AuthContext = createContext<AuthValue | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
   const [state, setState] = useState<AuthState>({ status: 'loading' });
+  const { status: connection } = useConnection();
   const endingOnPurpose = useRef(false);
 
   useEffect(() => {
     const stop = clientState.onSessionChange((session) => {
       if (session) {
+        saveOfflineUser(session.user);
         setState({ status: 'authenticated', user: session.user });
         return;
       }
+      // The session is over (not merely unreachable): forget what was kept for offline use.
+      clearOfflineData();
       setState((current) =>
         current.status === 'authenticated'
           ? { status: 'anonymous', reason: endingOnPurpose.current ? 'signed-out' : 'expired' }
@@ -56,9 +63,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       );
       endingOnPurpose.current = false;
     });
-    void refreshSession();
+    refreshSession().catch(() => {
+      // No connection: open with what this device remembers, if anything.
+      const remembered = loadOfflineUser();
+      setState(
+        remembered
+          ? { status: 'authenticated', user: remembered, offline: true }
+          : { status: 'anonymous', reason: 'initial' },
+      );
+    });
     return stop;
   }, []);
+
+  // Back online after opening offline: restore the real session (or learn that it ended).
+  const offline = state.status === 'authenticated' && state.offline === true;
+  useEffect(() => {
+    if (offline && connection === 'online') refreshSession().catch(() => undefined);
+  }, [offline, connection]);
 
   const signIn = useCallback((session: AuthResponse) => clientState.setSession(session), []);
 
@@ -74,6 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [endLocally]);
 
   const updateUser = useCallback((user: User) => {
+    saveOfflineUser(user);
     setState((current) =>
       current.status === 'authenticated' ? { status: 'authenticated', user } : current,
     );

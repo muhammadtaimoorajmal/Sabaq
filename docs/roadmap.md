@@ -176,7 +176,7 @@ For the product itself, see the [vision](vision.md).
 - A parser in the shared package that extracts date and time (including relative forms such as "next Wednesday 11 pm"), course, venue, task type and naming pattern from free text; extracted fields are highlighted for confirmation before anything is posted; a test corpus of realistic anonymized messages.
 - **Done when:** at least 90% field accuracy on the corpus; nothing is posted without confirmation.
 
-### M21 · Today and Timeline
+### M21 · Today and Timeline ✅
 
 - Today screen (overdue, due today, next seven days, today's classes and venues); timeline in list, week and month views; filters; mark as done with undo; personal tasks; countdowns; empty states that teach; offline copy.
 - **Done when:** the "find my next deadline" target from M09 is met; works offline after first load.

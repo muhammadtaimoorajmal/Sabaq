@@ -53,8 +53,12 @@ test.describe('keyboard', () => {
     await page.keyboard.press('Enter');
     await expect(page.locator('#main')).toBeFocused();
 
+    // Tab through the whole page (it wraps around to the header) until every control is reached.
+    const required = ['Today', 'Settings', 'Display settings', 'Account menu for Zara Ahmed'];
     const reached = new Set<string>();
-    for (let step = 0; step < 25; step += 1) {
+    const allReached = () =>
+      required.every((name) => [...reached].some((label) => label.includes(name)));
+    for (let step = 0; step < 200 && !allReached(); step += 1) {
       await page.keyboard.press('Tab');
       reached.add(
         await page.evaluate(() => {
@@ -63,7 +67,7 @@ test.describe('keyboard', () => {
         }),
       );
     }
-    for (const name of ['Today', 'Settings', 'Display settings', 'Account menu for Zara Ahmed']) {
+    for (const name of required) {
       expect(
         [...reached].some((label) => label.includes(name)),
         `${name} is reachable`,
@@ -81,6 +85,7 @@ const PAGES = [
   { path: '/', signedIn: true },
   { path: '/settings', signedIn: true },
   { path: '/inbox', signedIn: true },
+  { path: '/timeline', signedIn: true },
   { path: '/design-system', signedIn: false },
   { path: '/no-such-page', signedIn: false },
 ];

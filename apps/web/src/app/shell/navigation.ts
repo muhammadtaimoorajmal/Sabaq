@@ -1,8 +1,15 @@
-import { CalendarCheck, Inbox, type LucideIcon, School, Settings } from 'lucide-react';
+import {
+  CalendarCheck,
+  CalendarRange,
+  Inbox,
+  type LucideIcon,
+  School,
+  Settings,
+} from 'lucide-react';
 
 export interface NavItem {
   to: string;
-  label: 'nav.today' | 'nav.inbox' | 'nav.classes' | 'nav.settings';
+  label: 'nav.today' | 'nav.timeline' | 'nav.inbox' | 'nav.classes' | 'nav.settings';
   icon: LucideIcon;
   /** Match only this exact path (for the home page). */
   end?: boolean;
@@ -16,6 +23,7 @@ export interface NavItem {
  */
 export const NAV_ITEMS: NavItem[] = [
   { to: '/', label: 'nav.today', icon: CalendarCheck, end: true },
+  { to: '/timeline', label: 'nav.timeline', icon: CalendarRange },
   { to: '/inbox', label: 'nav.inbox', icon: Inbox, showsUnread: true },
   { to: '/classes', label: 'nav.classes', icon: School },
   { to: '/settings', label: 'nav.settings', icon: Settings },

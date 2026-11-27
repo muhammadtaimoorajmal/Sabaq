@@ -78,7 +78,7 @@ describe('classes list', () => {
   });
 
   it('lists classes with role and size', async () => {
-    start('/', { 'GET /api/classes': () => json(200, [cls()]) });
+    start('/classes', { 'GET /api/classes': () => json(200, [cls()]) });
     const link = await screen.findByRole('link', { name: /BS Computer Science/ });
     expect(link).toHaveAttribute('href', `/classes/${CLASS_ID}`);
     expect(within(link).getByText('Class representative')).toBeInTheDocument();
