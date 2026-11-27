@@ -37,6 +37,7 @@ Everything here is **pure**: no network, no database, no browser APIs. Domain lo
 | `join-code` | Secure, unambiguous class join codes |
 | `announcements` | Which fields an edit really changed, which changes members must hear about again, and when a notification may be delivered given someone's quiet hours |
 | `paste` | **Paste-to-structure**: reads a chat-style message into a draft announcement (type, kind of task, course, date and time, venue, file-naming rule, file types, where to submit), with the exact span of text behind every detail |
+| `agenda` | Each day's class meetings from the weekly timetable, in the class's time zone and placed on the viewer's calendar, with announced cancellations and room changes applied |
 | `preferences` | Merging partial preference updates, and the database paths a partial update changes |
 
 ### Paste-to-structure

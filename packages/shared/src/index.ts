@@ -1,4 +1,5 @@
 // Schemas and types
+export * from './schemas/agenda.js';
 export * from './schemas/announcement.js';
 export * from './schemas/api.js';
 export * from './schemas/auth.js';
@@ -13,6 +14,7 @@ export * from './schemas/task.js';
 export * from './schemas/user.js';
 
 // Domain logic
+export * from './domain/agenda.js';
 export * from './domain/announcements.js';
 export * from './domain/join-code.js';
 export * from './domain/paste.js';
