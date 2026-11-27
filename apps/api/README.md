@@ -90,6 +90,15 @@ The feed covers every class the person belongs to; posting and managing happen i
 
 Members are notified of new posts and important changes. A notification created during someone's quiet hours is delivered when they end, in that person's time zone.
 
+### Agenda and tasks
+
+| Method and path | Purpose |
+| --- | --- |
+| `GET /api/agenda?from=YYYY-MM-DD&to=YYYY-MM-DD` | Tasks and class meetings for up to 62 days, in the person's time zone: class tasks from every class and personal tasks due in the range, plus unfinished work overdue within the last 30 days; each day's meetings with announced cancellations and room changes applied (`status`: `scheduled`, `cancelled` or `moved`, with the usual room) |
+| `POST /api/tasks` | Add a personal task (visible to its owner only; its course must be from one of the person's classes) |
+| `PATCH /api/tasks/:id`, `DELETE /api/tasks/:id` | Change or delete a personal task, or a class task without an announcement (instructors, class representatives). Tasks created by an announcement change with the announcement |
+| `PUT /api/tasks/:id/completion`, `DELETE /api/tasks/:id/completion` | Mark a task done or not done, for this person only |
+
 ### Your account (`/api/account`)
 
 Every route needs a session and acts on the signed-in person only.
@@ -193,6 +202,7 @@ src/
 ├── announcements/    Structured announcements, receipts and the unread feed
 ├── auth/             Sign-in, sessions, tokens, e-mail verification, passwords
 ├── classes/          Classes, memberships, roles and courses
+├── tasks/            The agenda, personal tasks and completion
 ├── db/               Connection, models, demo data
 ├── mail/             E-mail delivery and templates
 ├── cli/              Command-line tools (seed)
