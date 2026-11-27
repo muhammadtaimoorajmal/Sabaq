@@ -52,6 +52,14 @@ Open <http://localhost:5173> and sign in with the demo student `zara.ahmed@north
 | Choose a new password | `/reset-password#token=…` | Strength meter; clear next steps for expired or incomplete links |
 | Change password | Settings | Needs the current password; signs out other devices |
 
+## Workload
+
+| Screen | Path | Highlights |
+| --- | --- | --- |
+| Workload | `/workload` (from the timeline), and the **Workload** tab of each class | A summary in words (heavy days ahead, the busiest week); the next 4 or 16 weeks as a calendar whose days show their load with dots as well as colour (arrow keys move between days; choosing one lists what is due); the same days as a table; a legend and how load is counted |
+
+- **Clash warning while posting.** Choosing a due date in the announcement composer shows how busy the class already is that day, across all its courses. When the day would become heavy, it names the tasks already due and offers lighter nearby days (same time) to pick in one tap. It is advice only and never blocks posting; without a connection it is left out.
+
 ## Submission Checker
 
 | Screen | Path | Highlights |

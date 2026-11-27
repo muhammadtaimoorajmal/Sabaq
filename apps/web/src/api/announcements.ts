@@ -117,6 +117,7 @@ const refreshAll = (queryClient: QueryClient) =>
   Promise.all([
     queryClient.invalidateQueries({ queryKey: announcementKeys.all }),
     queryClient.invalidateQueries({ queryKey: ['agenda'] }),
+    queryClient.invalidateQueries({ queryKey: ['workload'] }),
   ]);
 
 export function useCreateAnnouncement(classId: string) {

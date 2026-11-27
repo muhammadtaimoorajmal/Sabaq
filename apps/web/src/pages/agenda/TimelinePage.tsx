@@ -7,16 +7,17 @@ import {
   type TaskType,
   zonedDateTime,
 } from '@sabaq/shared';
-import { ChevronLeft, ChevronRight, Plus, SlidersHorizontal } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Flame, Plus, SlidersHorizontal } from 'lucide-react';
 import { type KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 import { useAgenda } from '../../api/agenda';
 import { useClasses } from '../../api/classes';
 import { useCurrentUser } from '../../auth/AuthProvider';
 import {
   Alert,
   Button,
+  buttonVariants,
   EmptyState,
   Field,
   IconButton,
@@ -339,19 +340,25 @@ export function TimelinePage() {
           <h1 className="text-display font-bold tracking-tight text-text">{t('timeline.title')}</h1>
           <p className="text-muted">{t('timeline.intro')}</p>
         </div>
-        <Button
-          variant="secondary"
-          onClick={() =>
-            editor.add(
-              view === 'list' && day === today
-                ? null
-                : zonedDateTime(day, '23:59', timeZone).toISOString(),
-            )
-          }
-        >
-          <Plus aria-hidden="true" />
-          {t('agenda.addTask')}
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Link to="/workload" className={buttonVariants({ variant: 'ghost' })}>
+            <Flame aria-hidden="true" />
+            {t('workload.open')}
+          </Link>
+          <Button
+            variant="secondary"
+            onClick={() =>
+              editor.add(
+                view === 'list' && day === today
+                  ? null
+                  : zonedDateTime(day, '23:59', timeZone).toISOString(),
+              )
+            }
+          >
+            <Plus aria-hidden="true" />
+            {t('agenda.addTask')}
+          </Button>
+        </div>
       </header>
 
       <div className="flex flex-col gap-4 rounded-xl border-default border-border bg-surface p-4">

@@ -44,6 +44,7 @@ import {
 } from '../tasks/rule-draft';
 import { RuleFields } from '../tasks/RuleFields';
 import { useRuleErrors } from '../tasks/RuleSheet';
+import { DueDateAdvice } from '../workload/DueDateAdvice';
 import { TYPE_META } from './meta';
 
 const DEADLINE_TASKS: TaskType[] = ['assignment', 'lab', 'project', 'reading', 'other'];
@@ -476,6 +477,16 @@ export function AnnouncementComposer({
                 required
               />
               <p className="-mt-3 text-sm text-muted">{t('announcements.composer.taskNote')}</p>
+              {draft.dueAt && (
+                <DueDateAdvice
+                  classId={draft.classId}
+                  timeZone={timeZone}
+                  dueAt={draft.dueAt}
+                  type={draft.taskType}
+                  ignoreTaskId={announcement?.taskId}
+                  onPick={(dueAt) => set({ dueAt })}
+                />
+              )}
             </>
           )}
 

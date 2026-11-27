@@ -186,7 +186,7 @@ For the product itself, see the [vision](vision.md).
 - Instructors attach rules to any task (naming pattern built from tokens with live preview, allowed types, maximum size, submission channel, late policy); students drop a file onto the task; checks run entirely in the browser; results show a checklist with exact fixes, the corrected file name with a copy button, and where to submit.
 - **Done when:** every rule violation in the test suite is caught, with zero false alarms on correct files.
 
-### M23 · Workload heatmap and clash warning
+### M23 · Workload heatmap and clash warning ✅
 
 - Class workload across all courses; week and term heatmaps with an equivalent table view that does not rely on color; while an instructor picks a due date, an inline notice shows that day's load and suggests lighter days (advisory, never blocking).
 - **Done when:** suggestions match the domain tests; the view is understandable without color.

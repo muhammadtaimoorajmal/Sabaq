@@ -26,6 +26,7 @@ export const classKeys = {
 const refreshClassViews = (queryClient: QueryClient) => {
   void queryClient.invalidateQueries({ queryKey: ['announcements'] });
   void queryClient.invalidateQueries({ queryKey: ['agenda'] });
+  void queryClient.invalidateQueries({ queryKey: ['workload'] });
 };
 
 export const useClasses = () =>

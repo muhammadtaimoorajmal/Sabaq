@@ -21,6 +21,7 @@ import {
 } from '../../components/ui';
 import { errorKey } from '../../i18n';
 import { AnnouncementFeed } from '../announcements/AnnouncementFeed';
+import { WorkloadView } from '../workload/WorkloadView';
 import { NotFoundPage } from '../StatusPages';
 import { ClassDetailsForm } from './ClassDetailsForm';
 import { CoursesTab } from './CoursesTab';
@@ -92,7 +93,7 @@ function SettingsTab({ cls }: { cls: ClassForMember }) {
   );
 }
 
-const TABS = ['announcements', 'courses', 'members', 'settings'] as const;
+const TABS = ['announcements', 'courses', 'workload', 'members', 'settings'] as const;
 type TabName = (typeof TABS)[number];
 
 /** One class: invite card, then announcements, courses, members and (for managers) settings. */
@@ -162,6 +163,12 @@ export function ClassPage() {
         </TabPanel>
         <TabPanel value="courses">
           <CoursesTab cls={data} />
+        </TabPanel>
+        <TabPanel value="workload">
+          <div className="flex flex-col gap-4">
+            <p className="text-muted">{t('workload.classIntro')}</p>
+            <WorkloadView scope={{ kind: 'class', classId: data.id }} timeZone={data.timeZone} />
+          </div>
         </TabPanel>
         <TabPanel value="members">
           <MembersTab cls={data} />

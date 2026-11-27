@@ -131,6 +131,7 @@ export function useSaveTask() {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: agendaKeys.all }),
         queryClient.invalidateQueries({ queryKey: taskKeys.all }),
+        queryClient.invalidateQueries({ queryKey: ['workload'] }),
       ]);
     },
   });
@@ -140,6 +141,11 @@ export function useDeleteTask() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => api<undefined>(`/tasks/${id}`, { method: 'DELETE' }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: agendaKeys.all }),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: agendaKeys.all }),
+        queryClient.invalidateQueries({ queryKey: ['workload'] }),
+      ]);
+    },
   });
 }

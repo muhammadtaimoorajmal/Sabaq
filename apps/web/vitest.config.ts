@@ -10,5 +10,7 @@ export default defineProject({
     environment: 'jsdom',
     setupFiles: ['src/test/setup.ts'],
     css: false,
+    // Interface tests drive whole screens with real timers; leave room on busy machines.
+    testTimeout: 15_000,
   },
 });

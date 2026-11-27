@@ -76,6 +76,14 @@ export const routes: RouteObject[] = [
               import('../pages/agenda/TimelinePage').then((m) => ({ Component: m.TimelinePage })),
           },
           {
+            path: 'workload',
+            handle: handle('workload.title'),
+            lazy: () =>
+              import('../pages/workload/WorkloadPage').then((m) => ({
+                Component: m.WorkloadPage,
+              })),
+          },
+          {
             path: 'tasks/:taskId',
             handle: handle('task.pageTitle'),
             lazy: () => import('../pages/tasks/TaskPage').then((m) => ({ Component: m.TaskPage })),

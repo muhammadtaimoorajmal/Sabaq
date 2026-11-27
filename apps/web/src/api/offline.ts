@@ -10,8 +10,8 @@ export const OFFLINE_USER_KEY = 'sabaq.offlineUser';
 /** Saved answers older than this are not used. */
 export const OFFLINE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 
-/** Only what is needed offline is saved: the agenda, tasks, classes and announcements. */
-const SAVED_QUERIES = new Set(['agenda', 'tasks', 'classes', 'announcements']);
+/** Only what is needed offline is saved: the agenda, tasks, workload, classes and announcements. */
+const SAVED_QUERIES = new Set(['agenda', 'tasks', 'workload', 'classes', 'announcements']);
 
 export const browserStorage = (): Storage | undefined => {
   try {
