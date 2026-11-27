@@ -17,6 +17,8 @@ import type { Config } from './config/env.js';
 import { AppError } from './lib/errors.js';
 import { tasksRouter } from './tasks/routes.js';
 import { TaskService } from './tasks/service.js';
+import { classWorkloadRouter, workloadRouter } from './workload/routes.js';
+import { WorkloadService } from './workload/service.js';
 import { errorHandler, notFound } from './middleware/errors.js';
 import { httpLogger, isHealthRequest } from './middleware/http-logger.js';
 import { REQUEST_ID_HEADER } from './middleware/request-id.js';
@@ -104,7 +106,13 @@ export function createApp({
     '/api/classes/:classId/announcements',
     classAnnouncementsRouter({ service: announcements, classes, authenticated }),
   );
+  const workload = new WorkloadService(classes);
+  app.use(
+    '/api/classes/:classId/workload',
+    classWorkloadRouter({ service: workload, authenticated }),
+  );
   app.use('/api/classes', classesRouter({ service: classes, authenticated }));
+  app.use('/api/workload', workloadRouter({ service: workload, authenticated }));
   app.use('/api/announcements', announcementFeedRouter({ service: announcements, authenticated }));
   app.use('/api', tasksRouter({ service: new TaskService({ now }), authenticated }));
   const account = new AccountService({ logger, now });

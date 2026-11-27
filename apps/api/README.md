@@ -101,6 +101,13 @@ Members are notified of new posts and important changes. A notification created 
 | `PUT /api/tasks/:id/rule`, `DELETE /api/tasks/:id/rule` | Set or remove how the task must be submitted (file-name pattern, file types, size limit, where to submit, late policy): the owner of a personal task, or instructors and class representatives for any class task, including tasks created by announcements |
 | `PUT /api/tasks/:id/completion`, `DELETE /api/tasks/:id/completion` | Mark a task done or not done, for this person only |
 
+### Workload
+
+| Method and path | Purpose |
+| --- | --- |
+| `GET /api/workload?from=YYYY-MM-DD&to=YYYY-MM-DD` | The person's workload for up to 190 days, in their time zone: every day with its task count, load (each task's effort, by default from its type) and level (`none`, `light`, `moderate`, `heavy`, `extreme`), and the tasks behind it. Includes their personal tasks |
+| `GET /api/classes/:id/workload?from=…&to=…` | A class's workload across all its courses, in the class's time zone; class tasks only, never anyone's personal tasks. Members only |
+
 ### Your account (`/api/account`)
 
 Every route needs a session and acts on the signed-in person only.
@@ -205,6 +212,7 @@ src/
 ├── auth/             Sign-in, sessions, tokens, e-mail verification, passwords
 ├── classes/          Classes, memberships, roles and courses
 ├── tasks/            The agenda, personal tasks and completion
+├── workload/         Daily load for a person or a class
 ├── db/               Connection, models, demo data
 ├── mail/             E-mail delivery and templates
 ├── cli/              Command-line tools (seed)
