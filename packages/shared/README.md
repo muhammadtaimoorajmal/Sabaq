@@ -21,6 +21,8 @@ Everything here is **pure**: no network, no database, no browser APIs. Domain lo
 | `task` | Class and personal tasks |
 | `submission-rule` | Naming patterns, allowed file types, size limits, submission channel, late policy |
 | `announcement` | Typed announcements, edit history, "seen by" receipts |
+| `agenda` | Tasks and class meetings for a range of days, with each task's course, class and permissions |
+| `workload` | Daily load and level for a range of up to 190 days, and the tasks behind it |
 | `planner` | Study slots |
 | `study-group` | Study groups and join requests |
 | `notification` | Language-independent notifications |

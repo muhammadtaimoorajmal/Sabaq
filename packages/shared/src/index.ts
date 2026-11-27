@@ -1,5 +1,6 @@
 // Schemas and types
 export * from './schemas/agenda.js';
+export * from './schemas/workload.js';
 export * from './schemas/announcement.js';
 export * from './schemas/api.js';
 export * from './schemas/auth.js';
