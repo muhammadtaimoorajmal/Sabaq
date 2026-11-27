@@ -70,8 +70,9 @@ test('the timeline works by keyboard in every view', async ({ page }) => {
   await selected.focus();
   const before = await selected.getAttribute('data-day');
   await page.keyboard.press('ArrowRight');
+  // Wait for the selection to move before checking where focus is.
+  await expect(page.locator('[aria-pressed="true"]')).not.toHaveAttribute('data-day', before ?? '');
   await expect(page.locator('[aria-pressed="true"]')).toBeFocused();
-  expect(await page.locator('[aria-pressed="true"]').getAttribute('data-day')).not.toBe(before);
   await expectNoViolations(page);
 
   for (const view of ['week', 'list']) {

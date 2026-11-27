@@ -31,8 +31,10 @@ test('a student sees crunch days in words, as a calendar and as a table', async 
   await expect(page.getByRole('heading', { level: 2, name: /heavy days? ahead/ })).toBeVisible();
   await expect(page.getByText(/^Busiest week: /)).toBeVisible();
   const today = page.locator('[aria-pressed="true"]');
+  const before = await today.getAttribute('data-day');
   await today.focus();
   await page.keyboard.press('ArrowRight');
+  await expect(page.locator('[aria-pressed="true"]')).not.toHaveAttribute('data-day', before ?? '');
   await expect(page.locator('[aria-pressed="true"]')).toBeFocused();
   await expectNoViolations(page);
   expect(await scrollsSideways(page)).toBe(false);
